@@ -196,10 +196,45 @@ visualizer.render(features, output="spectrogram.png")
 
 ```bash
 # API 서버 시작
-python -m src.api.app
+python run_api_server.py
 
 # API 문서 확인
-# http://localhost:8000/docs
+# Swagger UI: http://localhost:8000/docs
+# ReDoc: http://localhost:8000/redoc
+```
+
+**API 엔드포인트:**
+
+- `/api/v1/audio/upload` - 오디오 업로드
+- `/api/v1/analysis/analyze` - 분석 요청
+- `/api/v1/visualize/render` - 시각화 렌더링
+- `/ws/audio/{audio_id}` - 오디오 스트림 (WebSocket)
+- `/ws/features/{audio_id}` - 특성 스트림 (WebSocket)
+
+**Python 클라이언트 예제:**
+
+```python
+from pathlib import Path
+from docs.examples.api_client_examples import AudioVisualizationClient
+
+with AudioVisualizationClient() as client:
+    # 오디오 업로드
+    result = client.upload_audio(Path("audio.mp3"))
+    audio_id = result["audio_id"]
+
+    # 분석 요청
+    analysis = client.analyze_audio(audio_id)
+    completed = client.wait_for_analysis(analysis["analysis_id"])
+
+    # 시각화 렌더링
+    viz = client.render_visualization(
+        viz_type="particles",
+        analysis_id=completed["analysis_id"],
+        params={"num_particles": 3000}
+    )
+
+    # 다운로드
+    client.download_visualization(viz["viz_id"], Path("output.png"))
 ```
 
 ## 설정
@@ -301,11 +336,11 @@ MIT License
 
 ## 로드맵
 
-- [ ] Phase 1: 기초 및 기본 재생 (진행 중)
-- [ ] Phase 2: 오디오 분석
-- [ ] Phase 3: 통계적 시각화
-- [ ] Phase 4: 예술적 시각화
-- [ ] Phase 5: API 통합
+- [x] Phase 1: 기초 및 기본 재생 ✅
+- [x] Phase 2: 오디오 분석 ✅
+- [x] Phase 3: 통계적 시각화 ✅
+- [x] Phase 4: 예술적 시각화 ✅
+- [x] Phase 5: API 통합 ✅
 - [ ] Phase 6: 3D/4D 시각화
 - [ ] Phase 7: 최종 통합 및 최적화
 - [ ] 머신러닝 기반 분류

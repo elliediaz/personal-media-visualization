@@ -117,19 +117,25 @@ visualization:
 
 # API 설정
 api:
+  # 버전
+  version: "1.0.0"
+
   # 서버 설정
-  server:
-    host: "0.0.0.0"
-    port: 8000
-    workers: 4
-    reload: false
+  host: "0.0.0.0"
+  port: 8000
+  workers: 4
+  reload: false
+
+  # 업로드 설정
+  upload_dir: "data/uploads"
+  output_dir: "output/api"
+  max_upload_size: 104857600  # 100MB (bytes)
 
   # CORS 설정
   cors:
     enabled: true
     origins:
-      - "http://localhost:3000"
-      - "http://localhost:8080"
+      - "*"
     methods: ["GET", "POST", "PUT", "DELETE"]
     headers: ["*"]
 

@@ -445,6 +445,53 @@ class AudioPlayer:
 
             time.sleep(0.1)  # 100ms마다 체크
 
+    def get_audio_data(self) -> tuple:
+        """
+        오디오 데이터 반환 (librosa 사용)
+
+        Returns:
+            (audio_data, sample_rate) 튜플
+
+        Raises:
+            AudioException: 파일이 로드되지 않은 경우
+        """
+        if self._file_path is None:
+            raise AudioException("로드된 파일이 없습니다")
+
+        try:
+            import librosa
+
+            y, sr = librosa.load(str(self._file_path), sr=self._sample_rate)
+            logger.debug(f"오디오 데이터 로드: shape={y.shape}, sr={sr}")
+            return y, sr
+
+        except Exception as e:
+            raise AudioException(f"오디오 데이터 로드 실패: {e}")
+
+    def get_duration_accurate(self) -> float:
+        """
+        정확한 오디오 길이 반환 (librosa 사용)
+
+        Returns:
+            길이 (초)
+
+        Raises:
+            AudioException: 파일이 로드되지 않은 경우
+        """
+        if self._file_path is None:
+            raise AudioException("로드된 파일이 없습니다")
+
+        try:
+            import librosa
+
+            duration = librosa.get_duration(path=str(self._file_path))
+            self._duration = duration  # 캐시 업데이트
+            logger.debug(f"정확한 길이: {duration:.2f}초")
+            return duration
+
+        except Exception as e:
+            raise AudioException(f"길이 계산 실패: {e}")
+
     def __del__(self):
         """소멸자: 리소스 정리"""
         try:

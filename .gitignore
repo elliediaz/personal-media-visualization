@@ -205,3 +205,48 @@ cython_debug/
 marimo/_static/
 marimo/_lsp/
 __marimo__/
+
+# Claude Code 관련 파일 (버전 관리 제외)
+CLAUDE.md
+CLAUDE.MD
+.claude/
+claude_*.md
+*_claude_*.md
+
+# 프로젝트 특화 제외 항목
+# 오디오 파일
+*.mp3
+*.wav
+*.flac
+*.ogg
+*.m4a
+*.aac
+*.wma
+
+# 비디오 파일
+*.mp4
+*.avi
+*.mkv
+*.mov
+
+# 대용량 데이터 및 캐시
+data/audio_cache/
+data/analysis_cache/
+output/renders/
+output/exports/
+
+# IDE 및 에디터 설정
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS 관련
+.DS_Store
+Thumbs.db
+
+# 임시 파일
+temp/
+tmp/
+*.tmp

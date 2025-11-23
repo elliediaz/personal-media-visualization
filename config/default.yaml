@@ -1,0 +1,237 @@
+# Personal Media Visualization - 기본 설정
+
+# 애플리케이션 설정
+app:
+  name: "Personal Media Visualization"
+  version: "0.1.0"
+  debug: false
+  log_level: "INFO"
+
+# 오디오 설정
+audio:
+  # 샘플링 레이트 (Hz)
+  sample_rate: 44100
+
+  # 버퍼 크기 (샘플 수)
+  buffer_size: 2048
+
+  # 지원 포맷
+  supported_formats:
+    - mp3
+    - wav
+    - flac
+    - ogg
+    - m4a
+    - aac
+
+  # 재생 설정
+  playback:
+    default_volume: 0.8
+    fade_duration: 0.5  # 초
+    seek_step: 5.0      # 초
+
+# 분석 설정
+analysis:
+  # 프레임 크기 (FFT)
+  frame_size: 2048
+
+  # 홉 크기 (샘플)
+  hop_size: 512
+
+  # Mel 스펙트로그램
+  mel:
+    n_mels: 128
+    fmin: 20
+    fmax: 20000
+
+  # MFCC
+  mfcc:
+    n_mfcc: 13
+
+  # 템포 분석
+  tempo:
+    min_bpm: 60
+    max_bpm: 200
+
+  # 캐싱
+  cache:
+    enabled: true
+    ttl: 86400  # 24시간 (초)
+    directory: "data/cache"
+
+# 시각화 설정
+visualization:
+  # 일반 설정
+  general:
+    fps: 60
+    width: 1920
+    height: 1080
+    dpi: 100
+    antialiasing: true
+
+  # 색상 테마
+  colors:
+    background: "#000000"
+    foreground: "#FFFFFF"
+    primary: "#00FFFF"
+    secondary: "#FF00FF"
+    accent: "#FFFF00"
+
+  # 통계적 시각화
+  statistical:
+    waveform:
+      line_width: 1.5
+      alpha: 0.8
+
+    spectrogram:
+      colormap: "viridis"
+      interpolation: "bilinear"
+
+    spectrum:
+      smoothing: 0.7
+      peak_detection: true
+
+  # 예술적 시각화
+  artistic:
+    particles:
+      count: 5000
+      size_range: [1, 5]
+      lifetime: 2.0  # 초
+
+    shaders:
+      post_processing: true
+      bloom: true
+      motion_blur: false
+
+  # 3D 시각화
+  advanced:
+    camera:
+      fov: 60
+      near: 0.1
+      far: 1000.0
+
+    quality:
+      lod_enabled: true
+      shadows: true
+      antialiasing_samples: 4
+
+# API 설정
+api:
+  # 버전
+  version: "1.0.0"
+
+  # 서버 설정
+  host: "0.0.0.0"
+  port: 8000
+  workers: 4
+  reload: false
+
+  # 업로드 설정
+  upload_dir: "data/uploads"
+  output_dir: "output/api"
+  max_upload_size: 104857600  # 100MB (bytes)
+
+  # CORS 설정
+  cors:
+    enabled: true
+    origins:
+      - "*"
+    methods: ["GET", "POST", "PUT", "DELETE"]
+    headers: ["*"]
+
+  # 인증
+  auth:
+    enabled: false
+    api_key_header: "X-API-Key"
+
+  # Rate Limiting
+  rate_limit:
+    enabled: true
+    requests_per_minute: 60
+
+  # WebSocket
+  websocket:
+    heartbeat_interval: 30  # 초
+    max_connections: 100
+
+# 경로 설정
+paths:
+  data_dir: "data"
+  cache_dir: "data/cache"
+  output_dir: "output"
+  renders_dir: "output/renders"
+  exports_dir: "output/exports"
+  temp_dir: "temp"
+
+# 로깅 설정
+logging:
+  version: 1
+  disable_existing_loggers: false
+
+  formatters:
+    standard:
+      format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+      datefmt: "%Y-%m-%d %H:%M:%S"
+
+    colored:
+      format: "%(log_color)s%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+      datefmt: "%Y-%m-%d %H:%M:%S"
+
+  handlers:
+    console:
+      class: "logging.StreamHandler"
+      level: "INFO"
+      formatter: "colored"
+      stream: "ext://sys.stdout"
+
+    file:
+      class: "logging.handlers.RotatingFileHandler"
+      level: "DEBUG"
+      formatter: "standard"
+      filename: "logs/app.log"
+      maxBytes: 10485760  # 10MB
+      backupCount: 5
+
+  loggers:
+    src:
+      level: "DEBUG"
+      handlers: ["console", "file"]
+      propagate: false
+
+  root:
+    level: "INFO"
+    handlers: ["console"]
+
+# 성능 설정
+performance:
+  # 멀티프로세싱
+  multiprocessing:
+    enabled: true
+    workers: null  # null = CPU 코어 수
+
+  # GPU 가속
+  gpu:
+    enabled: true
+    device: "cuda:0"  # cuda:0, cuda:1, cpu
+
+  # 메모리
+  memory:
+    max_cache_size_mb: 1024
+    gc_threshold: 0.8  # 80%
+
+# 실험적 기능
+experimental:
+  # VR/AR 지원
+  vr:
+    enabled: false
+    target_fps: 90
+
+  # 머신러닝
+  ml:
+    enabled: false
+    model_path: "models/"
+
+  # 라이브 입력
+  live_input:
+    enabled: false
+    device_index: 0

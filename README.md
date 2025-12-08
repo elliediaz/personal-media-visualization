@@ -115,6 +115,29 @@ personal-media-visualization/
 
 각 단계는 독립적으로 개발, 테스트, 커밋되며 최종적으로 하나의 통합 솔루션으로 합쳐집니다.
 
+## 빠른 시작
+
+### 실행 스크립트 사용 (권장)
+
+```bash
+# Linux/macOS
+./run.sh              # API 서버 시작
+./run.sh dev          # 개발 모드 (자동 리로드)
+./run.sh test         # 테스트 실행
+./run.sh help         # 도움말
+
+# Windows
+run.bat               # API 서버 시작
+run.bat dev           # 개발 모드
+run.bat test          # 테스트 실행
+run.bat help          # 도움말
+```
+
+서버 시작 후 접속:
+- 웹 인터페이스: http://localhost:8000/web
+- API 문서 (Swagger): http://localhost:8000/docs
+- API 문서 (ReDoc): http://localhost:8000/redoc
+
 ## 설치 방법
 
 ### 요구사항
@@ -336,11 +359,12 @@ MIT License
 
 ## 로드맵
 
-- [x] Phase 1: 기초 및 기본 재생 ✅
-- [x] Phase 2: 오디오 분석 ✅
-- [x] Phase 3: 통계적 시각화 ✅
-- [x] Phase 4: 예술적 시각화 ✅
-- [x] Phase 5: API 통합 ✅
+- [x] Phase 1: 기초 및 기본 재생
+- [x] Phase 2: 오디오 분석
+- [x] Phase 3: 통계적 시각화
+- [x] Phase 4: 예술적 시각화
+- [x] Phase 5: API 통합
+- [x] Phase 5.5: 웹 인터페이스 및 CLI 완성
 - [ ] Phase 6: 3D/4D 시각화
 - [ ] Phase 7: 최종 통합 및 최적화
 - [ ] 머신러닝 기반 분류

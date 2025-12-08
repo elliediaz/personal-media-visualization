@@ -7,16 +7,22 @@ REST API 및 WebSocket 서버
 import time
 from contextlib import asynccontextmanager
 from datetime import datetime
+from pathlib import Path
 from typing import Any, Dict
 
 from fastapi import FastAPI, Request, status
 from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import JSONResponse
+from fastapi.responses import HTMLResponse, JSONResponse
+from fastapi.staticfiles import StaticFiles
+from fastapi.templating import Jinja2Templates
 
 from src.api.models import ErrorResponse, HealthResponse
 from src.core.config import Config
 from src.utils.logging import get_logger, setup_logging
+
+# 프로젝트 루트 경로
+PROJECT_ROOT = Path(__file__).parent.parent.parent
 
 # 로깅 설정
 setup_logging("api")
@@ -269,3 +275,50 @@ def register_websockets():
 
 
 register_websockets()
+
+
+# ===== 정적 파일 및 템플릿 =====
+
+
+def setup_static_files():
+    """정적 파일 서빙 설정"""
+    static_path = PROJECT_ROOT / "static"
+    output_path = PROJECT_ROOT / "output"
+
+    if static_path.exists():
+        app.mount("/static", StaticFiles(directory=str(static_path)), name="static")
+        logger.info(f"정적 파일 서빙: {static_path}")
+
+    if output_path.exists():
+        app.mount("/output", StaticFiles(directory=str(output_path)), name="output")
+        logger.info(f"출력 파일 서빙: {output_path}")
+
+
+setup_static_files()
+
+# 템플릿 설정
+templates_path = PROJECT_ROOT / "templates"
+templates = Jinja2Templates(directory=str(templates_path)) if templates_path.exists() else None
+
+
+@app.get("/web", response_class=HTMLResponse)
+async def web_index(request: Request):
+    """
+    웹 인터페이스 메인 페이지
+
+    Returns:
+        HTML 페이지
+    """
+    if templates:
+        return templates.TemplateResponse("index.html", {"request": request})
+    else:
+        return HTMLResponse(content="""
+        <!DOCTYPE html>
+        <html>
+        <head><title>PMViz</title></head>
+        <body>
+            <h1>Personal Media Visualization</h1>
+            <p>API 문서: <a href="/docs">/docs</a></p>
+        </body>
+        </html>
+        """)

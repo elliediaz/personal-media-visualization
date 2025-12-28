@@ -274,6 +274,66 @@ performance:
     max_cache_size_mb: 1024
     gc_threshold: 0.8  # 80%
 
+# 애니메이션 설정
+animation:
+  # 기본 설정
+  fps: 30
+  duration: 10.0  # 초
+
+  # GIF 내보내기
+  gif:
+    optimize: true
+    loop: 0  # 0 = 무한 반복
+    quality: 85
+
+  # MP4 내보내기
+  mp4:
+    codec: "libx264"
+    quality: 23  # CRF (낮을수록 고품질)
+    pixel_format: "yuv420p"
+
+  # 후처리
+  post_processing:
+    crt_effects: true
+    palette_quantize: false
+    dithering: false
+
+# 사이키델릭 시각화 설정
+psychedelic:
+  fractal:
+    type: "julia"  # julia, mandelbrot
+    max_iterations: 256
+    color_scheme: "synthwave"
+
+  tunnel:
+    type: "spiral"  # spiral, warp, vortex, grid
+    ring_count: 20
+    segment_count: 24
+    palette: "synthwave"
+
+  kaleidoscope:
+    segments: 8
+    pattern_type: "organic"  # organic, geometric, crystal, flower
+
+# 실험적 효과 설정
+experimental_effects:
+  glitch:
+    intensity: 0.5
+    rgb_shift: true
+    scanline_noise: true
+    block_glitch: true
+
+  matrix_rain:
+    font_size: 14
+    speed: 1.0
+    trail_length: 20
+
+  ascii:
+    cols: 80
+    rows: 40
+    char_set: "detailed"  # simple, detailed, blocks
+    colored: true
+
 # 실험적 기능
 experimental:
   # VR/AR 지원
@@ -290,3 +350,38 @@ experimental:
   live_input:
     enabled: false
     device_index: 0
+
+# 라즈베리파이 최적화 설정
+raspberry_pi:
+  enabled: false  # 자동 감지
+
+  # 성능 모드
+  performance_mode: "auto"  # auto, low, medium, high
+
+  # 저성능 모드 설정
+  low_mode:
+    resolution_scale: 0.5
+    particle_count: 500
+    fps_target: 30
+    effects_enabled: false
+
+  # 중간 성능 모드
+  medium_mode:
+    resolution_scale: 0.75
+    particle_count: 2000
+    fps_target: 45
+    effects_enabled: true
+
+  # 고성능 모드
+  high_mode:
+    resolution_scale: 1.0
+    particle_count: 5000
+    fps_target: 60
+    effects_enabled: true
+
+  # 자동 품질 조절
+  auto_quality:
+    enabled: true
+    min_fps: 25
+    target_fps: 30
+    check_interval: 1.0  # 초

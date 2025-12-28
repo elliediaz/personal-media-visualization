@@ -1,0 +1,158 @@
+/**
+ * 레트로 폰트 정의
+ *
+ * 픽셀/비트맵 스타일 폰트 시스템
+ */
+
+/* Google Fonts 로드 */
+@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&family=Share+Tech+Mono&family=Silkscreen&display=swap');
+
+/* 폰트 패밀리 정의 */
+:root {
+    /* 픽셀 폰트 (제목, 로고) */
+    --font-pixel: 'Press Start 2P', cursive;
+
+    /* 터미널 폰트 (본문, 숫자) */
+    --font-terminal: 'VT323', monospace;
+
+    /* 테크 폰트 (코드, 데이터) */
+    --font-tech: 'Share Tech Mono', monospace;
+
+    /* 실크스크린 폰트 (UI 요소) */
+    --font-silkscreen: 'Silkscreen', cursive;
+
+    /* 시스템 폰트 폴백 */
+    --font-system: 'Courier New', Courier, monospace;
+}
+
+/* 폰트 클래스 */
+.font-pixel {
+    font-family: var(--font-pixel);
+    letter-spacing: 1px;
+    /* 픽셀 퍼펙트 렌더링 */
+    -webkit-font-smoothing: none;
+    -moz-osx-font-smoothing: unset;
+    font-smooth: never;
+    text-rendering: optimizeSpeed;
+}
+
+.font-terminal {
+    font-family: var(--font-terminal);
+    letter-spacing: 0.5px;
+}
+
+.font-tech {
+    font-family: var(--font-tech);
+}
+
+.font-silkscreen {
+    font-family: var(--font-silkscreen);
+}
+
+/* 픽셀 퍼펙트 텍스트 */
+.pixel-perfect {
+    -webkit-font-smoothing: none;
+    -moz-osx-font-smoothing: unset;
+    font-smooth: never;
+    text-rendering: optimizeSpeed;
+    image-rendering: pixelated;
+    image-rendering: crisp-edges;
+}
+
+/* 레트로 제목 스타일 */
+.retro-title {
+    font-family: var(--font-pixel);
+    font-size: 1.5rem;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    text-shadow:
+        2px 2px 0 var(--secondary-color),
+        4px 4px 0 rgba(0, 0, 0, 0.5);
+}
+
+.retro-title-glow {
+    font-family: var(--font-pixel);
+    text-shadow:
+        0 0 5px currentColor,
+        0 0 10px currentColor,
+        0 0 20px currentColor,
+        0 0 40px currentColor;
+}
+
+/* 터미널 텍스트 */
+.terminal-text {
+    font-family: var(--font-terminal);
+    font-size: 1.2rem;
+    line-height: 1.5;
+    letter-spacing: 0.5px;
+}
+
+/* 타이핑 커서 효과 */
+.typing-cursor::after {
+    content: '|';
+    animation: blink 0.7s infinite;
+}
+
+@keyframes blink {
+    0%, 50% { opacity: 1; }
+    51%, 100% { opacity: 0; }
+}
+
+/* DOS 스타일 텍스트 */
+.dos-text {
+    font-family: var(--font-terminal);
+    font-size: 16px;
+    color: #00FF00;
+    background: #000;
+    padding: 0.5rem;
+}
+
+/* C64 스타일 텍스트 */
+.c64-text {
+    font-family: var(--font-pixel);
+    font-size: 8px;
+    color: #A0A0FF;
+    background: #4040E0;
+    padding: 0.25rem;
+    text-transform: uppercase;
+}
+
+/* 아케이드 스타일 텍스트 */
+.arcade-text {
+    font-family: var(--font-pixel);
+    font-size: 12px;
+    color: #FFD700;
+    text-shadow:
+        0 0 5px #FF6600,
+        0 0 10px #FF0000;
+}
+
+/* 스코어 표시 */
+.score-display {
+    font-family: var(--font-pixel);
+    font-size: 2rem;
+    color: var(--primary-color);
+    text-shadow: 3px 3px 0 rgba(0, 0, 0, 0.5);
+}
+
+/* 레트로 버튼 텍스트 */
+.retro-button-text {
+    font-family: var(--font-silkscreen);
+    font-size: 14px;
+    text-transform: uppercase;
+}
+
+/* 폰트 크기 유틸리티 */
+.text-xs { font-size: 8px; }
+.text-sm { font-size: 12px; }
+.text-md { font-size: 16px; }
+.text-lg { font-size: 24px; }
+.text-xl { font-size: 32px; }
+.text-2xl { font-size: 48px; }
+
+/* 픽셀 크기 (8px 단위) */
+.px-1 { font-size: 8px; }
+.px-2 { font-size: 16px; }
+.px-3 { font-size: 24px; }
+.px-4 { font-size: 32px; }
+.px-5 { font-size: 40px; }

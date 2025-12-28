@@ -1,0 +1,229 @@
+/**
+ * 레트로 색상 팔레트 정의
+ *
+ * C64, EGA, VGA 등 클래식 색상 팔레트
+ */
+
+:root {
+    /* ========================================
+       C64 팔레트 (16색)
+       ======================================== */
+    --c64-black: #000000;
+    --c64-white: #FFFFFF;
+    --c64-red: #880000;
+    --c64-cyan: #AAFFEE;
+    --c64-purple: #CC44CC;
+    --c64-green: #00CC55;
+    --c64-blue: #0000AA;
+    --c64-yellow: #EEEE77;
+    --c64-orange: #DD8855;
+    --c64-brown: #664400;
+    --c64-light-red: #FF7777;
+    --c64-dark-gray: #333333;
+    --c64-gray: #777777;
+    --c64-light-green: #AAFF66;
+    --c64-light-blue: #0088FF;
+    --c64-light-gray: #BBBBBB;
+
+    /* ========================================
+       EGA 팔레트 (16색)
+       ======================================== */
+    --ega-black: #000000;
+    --ega-blue: #0000AA;
+    --ega-green: #00AA00;
+    --ega-cyan: #00AAAA;
+    --ega-red: #AA0000;
+    --ega-magenta: #AA00AA;
+    --ega-brown: #AA5500;
+    --ega-light-gray: #AAAAAA;
+    --ega-dark-gray: #555555;
+    --ega-bright-blue: #5555FF;
+    --ega-bright-green: #55FF55;
+    --ega-bright-cyan: #55FFFF;
+    --ega-bright-red: #FF5555;
+    --ega-bright-magenta: #FF55FF;
+    --ega-yellow: #FFFF55;
+    --ega-white: #FFFFFF;
+
+    /* ========================================
+       VGA 기본 팔레트 (16색)
+       ======================================== */
+    --vga-black: #000000;
+    --vga-blue: #0000AA;
+    --vga-green: #00AA00;
+    --vga-cyan: #00AAAA;
+    --vga-red: #AA0000;
+    --vga-magenta: #AA00AA;
+    --vga-brown: #AA5500;
+    --vga-light-gray: #AAAAAA;
+    --vga-dark-gray: #555555;
+    --vga-light-blue: #5555FF;
+    --vga-light-green: #55FF55;
+    --vga-light-cyan: #55FFFF;
+    --vga-light-red: #FF5555;
+    --vga-light-magenta: #FF55FF;
+    --vga-yellow: #FFFF55;
+    --vga-white: #FFFFFF;
+
+    /* ========================================
+       네온/사이버펑크 팔레트
+       ======================================== */
+    --neon-pink: #FF00FF;
+    --neon-cyan: #00FFFF;
+    --neon-yellow: #FFFF00;
+    --neon-green: #00FF00;
+    --neon-orange: #FF6600;
+    --neon-purple: #9900FF;
+    --neon-blue: #0066FF;
+    --neon-red: #FF0033;
+
+    /* ========================================
+       Synthwave 팔레트
+       ======================================== */
+    --synth-dark-purple: #1a0a2e;
+    --synth-purple: #3d1a78;
+    --synth-magenta: #b91aff;
+    --synth-pink: #ff00ff;
+    --synth-hot-pink: #ff1493;
+    --synth-orange: #ff6b35;
+    --synth-yellow: #ffd700;
+    --synth-cyan: #00d4ff;
+    --synth-blue: #0077ff;
+
+    /* ========================================
+       CRT 그린 모노크롬
+       ======================================== */
+    --crt-green-dark: #001100;
+    --crt-green-dim: #003300;
+    --crt-green-medium: #006600;
+    --crt-green-bright: #00AA00;
+    --crt-green-light: #00FF00;
+
+    /* ========================================
+       CRT 앰버 모노크롬
+       ======================================== */
+    --crt-amber-dark: #1a0a00;
+    --crt-amber-dim: #3d1f00;
+    --crt-amber-medium: #7a3d00;
+    --crt-amber-bright: #cc6600;
+    --crt-amber-light: #ffaa00;
+
+    /* ========================================
+       Windows 3.1 시스템 색상
+       ======================================== */
+    --win31-desktop: #008080;
+    --win31-window: #C0C0C0;
+    --win31-title-active: #000080;
+    --win31-title-inactive: #808080;
+    --win31-text: #000000;
+    --win31-button-face: #C0C0C0;
+    --win31-button-highlight: #FFFFFF;
+    --win31-button-shadow: #808080;
+    --win31-button-dark-shadow: #000000;
+
+    /* ========================================
+       Windows 95/98 시스템 색상
+       ======================================== */
+    --win95-desktop: #008080;
+    --win95-window: #C0C0C0;
+    --win95-title-active: #000080;
+    --win95-title-inactive: #808080;
+    --win95-title-text-active: #FFFFFF;
+    --win95-title-text-inactive: #C0C0C0;
+    --win95-text: #000000;
+    --win95-button-face: #C0C0C0;
+    --win95-button-highlight: #FFFFFF;
+    --win95-button-light: #DFDFDF;
+    --win95-button-shadow: #808080;
+    --win95-button-dark-shadow: #000000;
+    --win95-selection: #000080;
+    --win95-selection-text: #FFFFFF;
+}
+
+/* 팔레트 클래스 - C64 테마 */
+.palette-c64 {
+    --bg-color: var(--c64-blue);
+    --text-color: var(--c64-light-blue);
+    --primary-color: var(--c64-cyan);
+    --secondary-color: var(--c64-purple);
+    --accent-color: var(--c64-yellow);
+}
+
+/* 팔레트 클래스 - EGA 테마 */
+.palette-ega {
+    --bg-color: var(--ega-black);
+    --text-color: var(--ega-light-gray);
+    --primary-color: var(--ega-bright-cyan);
+    --secondary-color: var(--ega-bright-magenta);
+    --accent-color: var(--ega-yellow);
+}
+
+/* 팔레트 클래스 - 네온 테마 */
+.palette-neon {
+    --bg-color: #0a0a0a;
+    --text-color: #e0e0e0;
+    --primary-color: var(--neon-cyan);
+    --secondary-color: var(--neon-pink);
+    --accent-color: var(--neon-yellow);
+}
+
+/* 팔레트 클래스 - Synthwave 테마 */
+.palette-synthwave {
+    --bg-color: var(--synth-dark-purple);
+    --text-color: #e0e0e0;
+    --primary-color: var(--synth-cyan);
+    --secondary-color: var(--synth-magenta);
+    --accent-color: var(--synth-yellow);
+}
+
+/* 팔레트 클래스 - 그린 모노크롬 */
+.palette-green-mono {
+    --bg-color: var(--crt-green-dark);
+    --text-color: var(--crt-green-light);
+    --primary-color: var(--crt-green-light);
+    --secondary-color: var(--crt-green-bright);
+    --accent-color: var(--crt-green-medium);
+}
+
+/* 팔레트 클래스 - 앰버 모노크롬 */
+.palette-amber-mono {
+    --bg-color: var(--crt-amber-dark);
+    --text-color: var(--crt-amber-light);
+    --primary-color: var(--crt-amber-light);
+    --secondary-color: var(--crt-amber-bright);
+    --accent-color: var(--crt-amber-medium);
+}
+
+/* 팔레트 클래스 - Windows 95 */
+.palette-win95 {
+    --bg-color: var(--win95-desktop);
+    --text-color: var(--win95-text);
+    --primary-color: var(--win95-title-active);
+    --secondary-color: var(--win95-selection);
+    --accent-color: var(--win95-button-highlight);
+}
+
+/* 색상 스와치 (미리보기용) */
+.color-swatch {
+    display: inline-block;
+    width: 24px;
+    height: 24px;
+    border: 1px solid #333;
+    margin: 2px;
+}
+
+/* 팔레트 그리드 */
+.palette-grid {
+    display: grid;
+    grid-template-columns: repeat(8, 1fr);
+    gap: 4px;
+    padding: 8px;
+    background: #111;
+    border-radius: 4px;
+}
+
+.palette-grid .color-swatch {
+    width: 100%;
+    padding-bottom: 100%;
+    margin: 0;
+}

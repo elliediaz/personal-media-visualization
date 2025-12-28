@@ -2,6 +2,7 @@
 예술적 시각화 기본 클래스
 
 오디오 반응형 예술적 시각화를 위한 기본 클래스
+레트로 CRT 효과 및 팔레트 통합 지원
 """
 
 import numpy as np
@@ -13,6 +14,100 @@ from src.visualization.base import BaseVisualizer
 from src.utils.logging import get_logger
 
 logger = get_logger(__name__)
+
+
+class RetroMixin:
+    """
+    레트로 효과 믹스인
+
+    기존 시각화 클래스에 레트로 기능을 추가하기 위한 믹스인
+    """
+
+    def apply_retro_palette(self, palette_name: str = "synthwave"):
+        """
+        레트로 팔레트 적용
+
+        Args:
+            palette_name: 팔레트 이름
+        """
+        try:
+            from src.visualization.retro.color_palettes import RetroPalettes
+            self._retro_palette = RetroPalettes.get_palette(palette_name)
+            self._retro_palette_name = palette_name
+            logger.debug(f"레트로 팔레트 적용: {palette_name}")
+        except ImportError:
+            logger.warning("레트로 팔레트 모듈을 찾을 수 없음")
+            self._retro_palette = None
+
+    def get_retro_color(self, index: int) -> tuple:
+        """
+        레트로 팔레트에서 색상 가져오기
+
+        Args:
+            index: 색상 인덱스
+
+        Returns:
+            (R, G, B) 튜플 (0-1 범위)
+        """
+        if hasattr(self, '_retro_palette') and self._retro_palette is not None:
+            palette = self._retro_palette
+            color = palette[index % len(palette)]
+            return (color[0] / 255, color[1] / 255, color[2] / 255)
+        return (1.0, 1.0, 1.0)
+
+    def quantize_image_to_palette(self, image: np.ndarray) -> np.ndarray:
+        """
+        이미지를 레트로 팔레트로 양자화
+
+        Args:
+            image: 입력 이미지 (RGB, 0-255)
+
+        Returns:
+            양자화된 이미지
+        """
+        if not hasattr(self, '_retro_palette') or self._retro_palette is None:
+            return image
+
+        try:
+            from src.visualization.retro.color_palettes import quantize_to_palette
+            return quantize_to_palette(image, self._retro_palette)
+        except ImportError:
+            return image
+
+    def enable_scanline_effect(self, intensity: float = 0.3):
+        """
+        스캔라인 효과 활성화
+
+        Args:
+            intensity: 효과 강도 (0.0-1.0)
+        """
+        self._scanline_enabled = True
+        self._scanline_intensity = np.clip(intensity, 0.0, 1.0)
+
+    def disable_scanline_effect(self):
+        """스캔라인 효과 비활성화"""
+        self._scanline_enabled = False
+
+    def apply_scanlines_to_image(self, image: np.ndarray) -> np.ndarray:
+        """
+        이미지에 스캔라인 효과 적용
+
+        Args:
+            image: 입력 이미지
+
+        Returns:
+            스캔라인이 적용된 이미지
+        """
+        if not getattr(self, '_scanline_enabled', False):
+            return image
+
+        intensity = getattr(self, '_scanline_intensity', 0.3)
+        result = image.astype(np.float64)
+
+        # 짝수 행에 어둡게 처리
+        result[::2, :] *= (1.0 - intensity)
+
+        return np.clip(result, 0, 255).astype(np.uint8)
 
 
 class BaseArtisticVisualizer(BaseVisualizer):

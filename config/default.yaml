@@ -115,6 +115,61 @@ visualization:
       shadows: true
       antialiasing_samples: 4
 
+  # CRT 효과 설정
+  crt:
+    enabled: true
+
+    # 스캔라인
+    scanlines:
+      enabled: true
+      intensity: 0.3
+      line_width: 2
+      gap: 2
+      animated: false
+
+    # RGB 색수차
+    chromatic_aberration:
+      enabled: true
+      intensity: 1.0
+      offset: 2
+      radial: true
+
+    # 노이즈
+    noise:
+      enabled: true
+      intensity: 0.05
+      monochrome: true
+      animated: true
+
+    # Bloom
+    bloom:
+      enabled: true
+      intensity: 0.4
+      radius: 5
+      threshold: 0.6
+      hdr: false
+
+    # 비네트
+    vignette:
+      enabled: true
+      intensity: 0.6
+      radius: 0.8
+      softness: 0.5
+
+    # 화면 곡률
+    curvature:
+      enabled: false
+      amount: 0.03
+      intensity: 1.0
+
+  # 레트로 UI 설정
+  retro_ui:
+    theme: "windows95"
+    font: "press-start-2p"
+    palette: "vga256"
+    pixel_perfect: true
+    bevel_depth: 2
+
 # API 설정
 api:
   # 버전

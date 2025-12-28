@@ -6,13 +6,16 @@
 
 from abc import ABC, abstractmethod
 from pathlib import Path
-from typing import Any, Optional
+from typing import TYPE_CHECKING, Any, Optional
 
 import matplotlib.pyplot as plt
 import numpy as np
 
 from src.core.config import config
 from src.utils.logging import get_logger
+
+if TYPE_CHECKING:
+    from src.visualization.retro import CRTProcessor
 
 logger = get_logger(__name__)
 
@@ -55,6 +58,10 @@ class BaseVisualizer(ABC):
         self.fig = None
         self.ax = None
 
+        # CRT 후처리 설정
+        self._crt_processor: Optional["CRTProcessor"] = None
+        self._crt_enabled = cfg.get("crt_enabled", False)
+
         logger.debug(f"{self.__class__.__name__} 초기화: {self.width}x{self.height}@{self.dpi}dpi")
 
     @abstractmethod
@@ -94,12 +101,13 @@ class BaseVisualizer(ABC):
 
         return self.fig, self.ax
 
-    def save(self, output_path: Path | str, **kwargs) -> None:
+    def save(self, output_path: Path | str, apply_crt: bool = None, **kwargs) -> None:
         """
         시각화 결과를 파일로 저장
 
         Args:
             output_path: 출력 파일 경로
+            apply_crt: CRT 효과 적용 여부 (None이면 self._crt_enabled 사용)
             **kwargs: plt.savefig()에 전달할 추가 인자
         """
         output_path = Path(output_path)
@@ -108,7 +116,39 @@ class BaseVisualizer(ABC):
         if self.fig is None:
             raise ValueError("Figure가 생성되지 않았습니다. render()를 먼저 호출하세요.")
 
-        # 기본 저장 옵션
+        # CRT 후처리 적용 여부 결정
+        should_apply_crt = apply_crt if apply_crt is not None else self._crt_enabled
+
+        if should_apply_crt and self._crt_processor is not None:
+            # Figure를 이미지로 변환 후 CRT 효과 적용
+            self._save_with_crt(output_path, **kwargs)
+        else:
+            # 기본 저장 옵션
+            save_options = {
+                "bbox_inches": "tight",
+                "facecolor": self.bg_color,
+                "edgecolor": "none",
+                "dpi": self.dpi,
+            }
+            save_options.update(kwargs)
+            self.fig.savefig(output_path, **save_options)
+
+        logger.info(f"시각화 저장 완료: {output_path}")
+
+    def _save_with_crt(self, output_path: Path, **kwargs) -> None:
+        """
+        CRT 효과를 적용하여 저장
+
+        Args:
+            output_path: 출력 파일 경로
+            **kwargs: 추가 옵션
+        """
+        from io import BytesIO
+
+        from PIL import Image
+
+        # Figure를 메모리에 렌더링
+        buf = BytesIO()
         save_options = {
             "bbox_inches": "tight",
             "facecolor": self.bg_color,
@@ -116,9 +156,75 @@ class BaseVisualizer(ABC):
             "dpi": self.dpi,
         }
         save_options.update(kwargs)
+        self.fig.savefig(buf, format="png", **save_options)
+        buf.seek(0)
 
-        self.fig.savefig(output_path, **save_options)
-        logger.info(f"시각화 저장 완료: {output_path}")
+        # PIL로 로드
+        img = Image.open(buf)
+        image_array = np.array(img.convert("RGB"))
+
+        # CRT 효과 적용
+        processed = self._crt_processor.process(image_array)
+
+        # 저장
+        Image.fromarray(processed).save(output_path)
+        buf.close()
+
+    def enable_crt(self, processor: "CRTProcessor" = None) -> None:
+        """
+        CRT 후처리 활성화
+
+        Args:
+            processor: CRT 프로세서 (None이면 기본 프로세서 생성)
+        """
+        if processor is None:
+            from src.visualization.retro import create_default_processor
+            processor = create_default_processor()
+
+        self._crt_processor = processor
+        self._crt_enabled = True
+        logger.debug("CRT 후처리 활성화")
+
+    def disable_crt(self) -> None:
+        """CRT 후처리 비활성화"""
+        self._crt_enabled = False
+        logger.debug("CRT 후처리 비활성화")
+
+    @property
+    def crt_processor(self) -> Optional["CRTProcessor"]:
+        """CRT 프로세서 반환"""
+        return self._crt_processor
+
+    def get_image_array(self) -> np.ndarray:
+        """
+        현재 Figure를 NumPy 배열로 반환
+
+        Returns:
+            RGB 이미지 배열 (H, W, 3)
+        """
+        from io import BytesIO
+
+        from PIL import Image
+
+        if self.fig is None:
+            raise ValueError("Figure가 생성되지 않았습니다. render()를 먼저 호출하세요.")
+
+        buf = BytesIO()
+        self.fig.savefig(
+            buf,
+            format="png",
+            bbox_inches="tight",
+            facecolor=self.bg_color,
+            edgecolor="none",
+            dpi=self.dpi,
+        )
+        buf.seek(0)
+
+        img = Image.open(buf)
+        image_array = np.array(img.convert("RGB"))
+        buf.close()
+
+        return image_array
 
     def show(self) -> None:
         """시각화 표시"""

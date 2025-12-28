@@ -142,6 +142,75 @@ def render_visualization(
                 viz.render(result, resolution=resolution, cmap=cmap, **params)
                 viz.save(output_file)
 
+        # 사이키델릭 시각화
+        elif request.viz_type == VisualizationType.FRACTAL:
+            from src.visualization.retro.psychedelic.fractal import FractalVisualizer
+
+            fractal_type = params.get("fractal_type", "julia")
+            color_scheme = params.get("color_scheme", "synthwave")
+            with FractalVisualizer() as viz:
+                viz.create_figure(figsize=figsize)
+                viz.render(result, fractal_type=fractal_type, color_scheme=color_scheme, **params)
+                viz.save(output_file)
+
+        elif request.viz_type == VisualizationType.TUNNEL:
+            from src.visualization.retro.psychedelic.tunnel import TunnelVisualizer
+
+            tunnel_type = params.get("tunnel_type", "spiral")
+            palette = params.get("palette", "synthwave")
+            with TunnelVisualizer() as viz:
+                viz.create_figure(figsize=figsize)
+                viz.render(result, tunnel_type=tunnel_type, palette=palette, **params)
+                viz.save(output_file)
+
+        elif request.viz_type == VisualizationType.KALEIDOSCOPE:
+            from src.visualization.retro.psychedelic.kaleidoscope import KaleidoscopeVisualizer
+
+            segments = params.get("segments", 8)
+            pattern_type = params.get("pattern_type", "organic")
+            with KaleidoscopeVisualizer() as viz:
+                viz.create_figure(figsize=figsize)
+                viz.render(result, segments=segments, pattern_type=pattern_type, **params)
+                viz.save(output_file)
+
+        elif request.viz_type == VisualizationType.OSCILLOSCOPE:
+            from src.visualization.artistic.waves import WaveInterferenceVisualizer
+
+            mode = params.get("mode", "oscilloscope")
+            style = params.get("style", "neon")
+            with WaveInterferenceVisualizer() as viz:
+                viz.create_figure(figsize=figsize)
+                viz.render(result, mode=mode, style=style, **params)
+                viz.save(output_file)
+
+        # 실험적 효과
+        elif request.viz_type == VisualizationType.GLITCH:
+            from src.visualization.retro.experimental.glitch_art import GlitchArtVisualizer
+
+            intensity = params.get("intensity", "medium")
+            with GlitchArtVisualizer() as viz:
+                viz.create_figure(figsize=figsize)
+                viz.render(result, intensity=intensity, **params)
+                viz.save(output_file)
+
+        elif request.viz_type == VisualizationType.ASCII:
+            from src.visualization.retro.experimental.ascii_renderer import ASCIIArtRenderer
+
+            mode = params.get("mode", "spectrum")
+            colored = params.get("colored", True)
+            with ASCIIArtRenderer() as viz:
+                viz.create_figure(figsize=figsize)
+                viz.render(result, mode=mode, colored=colored, **params)
+                viz.save(output_file)
+
+        elif request.viz_type == VisualizationType.MATRIX_RAIN:
+            from src.visualization.retro.experimental.matrix_rain import MatrixRainVisualizer
+
+            with MatrixRainVisualizer() as viz:
+                viz.create_figure(figsize=figsize)
+                viz.render(result, **params)
+                viz.save(output_file)
+
         else:
             raise ValueError(f"지원하지 않는 시각화 타입: {request.viz_type}")
 
@@ -355,6 +424,7 @@ async def get_presets():
         프리셋 목록
     """
     presets = [
+        # 통계적 시각화
         PresetInfo(
             name="기본 파형",
             description="기본 오디오 파형 시각화",
@@ -367,6 +437,7 @@ async def get_presets():
             viz_type=VisualizationType.MEL_SPECTROGRAM,
             params={},
         ),
+        # 예술적 시각화
         PresetInfo(
             name="에너지 파티클",
             description="에너지 기반 파티클 시각화",
@@ -390,6 +461,62 @@ async def get_presets():
             description="Twilight 컬러맵 파동 간섭",
             viz_type=VisualizationType.WAVES,
             params={"resolution": 600, "cmap": "twilight"},
+        ),
+        # 사이키델릭 시각화
+        PresetInfo(
+            name="Julia 프랙탈",
+            description="Julia 집합 프랙탈 시각화",
+            viz_type=VisualizationType.FRACTAL,
+            params={"fractal_type": "julia", "color_scheme": "synthwave"},
+        ),
+        PresetInfo(
+            name="Mandelbrot 프랙탈",
+            description="Mandelbrot 집합 프랙탈 시각화",
+            viz_type=VisualizationType.FRACTAL,
+            params={"fractal_type": "mandelbrot", "color_scheme": "rainbow"},
+        ),
+        PresetInfo(
+            name="터널 (Spiral)",
+            description="나선형 터널 효과",
+            viz_type=VisualizationType.TUNNEL,
+            params={"tunnel_type": "spiral", "palette": "synthwave"},
+        ),
+        PresetInfo(
+            name="터널 (Vortex)",
+            description="소용돌이 터널 효과",
+            viz_type=VisualizationType.TUNNEL,
+            params={"tunnel_type": "vortex", "palette": "neon"},
+        ),
+        PresetInfo(
+            name="만화경",
+            description="만화경 패턴 시각화",
+            viz_type=VisualizationType.KALEIDOSCOPE,
+            params={"segments": 8, "pattern_type": "organic"},
+        ),
+        PresetInfo(
+            name="오실로스코프 (Neon)",
+            description="네온 스타일 오실로스코프",
+            viz_type=VisualizationType.OSCILLOSCOPE,
+            params={"mode": "oscilloscope", "style": "neon"},
+        ),
+        # 실험적 효과
+        PresetInfo(
+            name="글리치 아트",
+            description="글리치 효과 시각화",
+            viz_type=VisualizationType.GLITCH,
+            params={"intensity": "medium"},
+        ),
+        PresetInfo(
+            name="ASCII 아트",
+            description="ASCII 문자 기반 시각화",
+            viz_type=VisualizationType.ASCII,
+            params={"mode": "spectrum", "colored": True},
+        ),
+        PresetInfo(
+            name="매트릭스 레인",
+            description="매트릭스 스타일 문자 비 효과",
+            viz_type=VisualizationType.MATRIX_RAIN,
+            params={},
         ),
     ]
 

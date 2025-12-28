@@ -18,15 +18,29 @@ from pydantic import BaseModel, Field, field_validator
 class VisualizationType(str, Enum):
     """시각화 타입"""
 
+    # 통계적 시각화
     WAVEFORM = "waveform"
     SPECTROGRAM = "spectrogram"
     MEL_SPECTROGRAM = "mel_spectrogram"
     SPECTRUM = "spectrum"
     FEATURES = "features"
     RHYTHM = "rhythm"
+
+    # 예술적 시각화
     PARTICLES = "particles"
     CIRCLES = "circles"
     WAVES = "waves"
+
+    # 사이키델릭 시각화
+    FRACTAL = "fractal"
+    TUNNEL = "tunnel"
+    KALEIDOSCOPE = "kaleidoscope"
+    OSCILLOSCOPE = "oscilloscope"
+
+    # 실험적 효과
+    GLITCH = "glitch"
+    ASCII = "ascii"
+    MATRIX_RAIN = "matrix_rain"
 
 
 class AnalysisStatus(str, Enum):

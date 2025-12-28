@@ -5,7 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Personal Media Visualization</title>
     <link rel="stylesheet" href="/static/css/style.css">
+    <link rel="stylesheet" href="/static/css/retro/crt.css">
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/pixi.js@7.x/dist/pixi.min.js"></script>
 </head>
 <body>
     <header>
@@ -67,8 +69,20 @@
                 <button class="viz-option" data-type="waves">웨이브</button>
             </div>
 
-            <div id="viz-preview" class="visualization-preview">
+            <div class="crt-controls" style="margin: 1rem 0; text-align: center;">
+                <button id="crt-toggle" class="crt-toggle active" onclick="toggleCRTEffect()">
+                    <span class="crt-toggle-indicator"></span>
+                    <span>CRT 효과</span>
+                </button>
+            </div>
+
+            <div id="viz-preview" class="visualization-preview crt-enabled">
                 <div class="spinner"></div>
+                <div class="crt-overlay">
+                    <div class="crt-scanlines"></div>
+                    <div class="crt-vignette"></div>
+                    <div class="crt-noise"></div>
+                </div>
             </div>
 
             <div style="text-align: center; margin-top: 1rem;">
@@ -116,6 +130,7 @@
         <p>MIT License</p>
     </footer>
 
+    <script src="/static/js/retro/crt-renderer.js"></script>
     <script src="/static/js/app.js"></script>
 </body>
 </html>

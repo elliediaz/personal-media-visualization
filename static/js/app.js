@@ -407,5 +407,25 @@ function downloadVisualization() {
     }
 }
 
+// CRT 효과 상태
+let crtEnabled = true;
+
+// CRT 효과 토글
+function toggleCRTEffect() {
+    crtEnabled = !crtEnabled;
+
+    const toggleBtn = document.getElementById('crt-toggle');
+    const vizPreview = document.getElementById('viz-preview');
+
+    if (toggleBtn) {
+        toggleBtn.classList.toggle('active', crtEnabled);
+    }
+
+    if (vizPreview) {
+        vizPreview.classList.toggle('crt-enabled', crtEnabled);
+    }
+}
+
 // 전역 함수 등록
 window.downloadVisualization = downloadVisualization;
+window.toggleCRTEffect = toggleCRTEffect;

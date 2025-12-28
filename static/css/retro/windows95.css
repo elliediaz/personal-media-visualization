@@ -1,0 +1,535 @@
+/**
+ * Windows 95 스타일 UI 컴포넌트
+ *
+ * 3D 베벨 효과, 버튼, 윈도우, 입력 필드 등
+ */
+
+/* ========================================
+   Windows 95 시스템 변수
+   ======================================== */
+:root {
+    /* 시스템 색상 */
+    --win95-bg: #C0C0C0;
+    --win95-text: #000000;
+    --win95-title-active: #000080;
+    --win95-title-inactive: #808080;
+    --win95-title-text: #FFFFFF;
+
+    /* 3D 베벨 색상 */
+    --win95-highlight: #FFFFFF;
+    --win95-light: #DFDFDF;
+    --win95-shadow: #808080;
+    --win95-dark-shadow: #000000;
+
+    /* 기타 */
+    --win95-selection: #000080;
+    --win95-selection-text: #FFFFFF;
+    --win95-disabled: #808080;
+    --win95-link: #0000FF;
+}
+
+/* ========================================
+   3D 베벨 효과
+   ======================================== */
+.win95-raised {
+    background: var(--win95-bg);
+    border: 2px solid;
+    border-color: var(--win95-highlight) var(--win95-dark-shadow) var(--win95-dark-shadow) var(--win95-highlight);
+    box-shadow: inset 1px 1px 0 var(--win95-light), inset -1px -1px 0 var(--win95-shadow);
+}
+
+.win95-sunken {
+    background: var(--win95-bg);
+    border: 2px solid;
+    border-color: var(--win95-dark-shadow) var(--win95-highlight) var(--win95-highlight) var(--win95-dark-shadow);
+    box-shadow: inset 1px 1px 0 var(--win95-shadow), inset -1px -1px 0 var(--win95-light);
+}
+
+.win95-groove {
+    border: 2px solid;
+    border-color: var(--win95-shadow) var(--win95-highlight) var(--win95-highlight) var(--win95-shadow);
+}
+
+.win95-ridge {
+    border: 2px solid;
+    border-color: var(--win95-highlight) var(--win95-shadow) var(--win95-shadow) var(--win95-highlight);
+}
+
+/* ========================================
+   버튼
+   ======================================== */
+.win95-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 75px;
+    height: 23px;
+    padding: 0 12px;
+    background: var(--win95-bg);
+    border: 2px solid;
+    border-color: var(--win95-highlight) var(--win95-dark-shadow) var(--win95-dark-shadow) var(--win95-highlight);
+    box-shadow: inset -1px -1px 0 var(--win95-shadow), inset 1px 1px 0 var(--win95-light);
+    font-family: 'MS Sans Serif', 'Segoe UI', Tahoma, sans-serif;
+    font-size: 11px;
+    color: var(--win95-text);
+    cursor: pointer;
+    outline: none;
+}
+
+.win95-button:hover {
+    background: #D4D0C8;
+}
+
+.win95-button:active,
+.win95-button.pressed {
+    border-color: var(--win95-dark-shadow) var(--win95-highlight) var(--win95-highlight) var(--win95-dark-shadow);
+    box-shadow: inset 1px 1px 0 var(--win95-shadow), inset -1px -1px 0 var(--win95-light);
+    padding: 1px 11px 0 13px;
+}
+
+.win95-button:disabled {
+    color: var(--win95-disabled);
+    cursor: not-allowed;
+}
+
+.win95-button:disabled::before {
+    content: '';
+    position: absolute;
+    top: 1px;
+    left: 1px;
+    right: -1px;
+    bottom: -1px;
+    color: var(--win95-highlight);
+}
+
+/* 기본 버튼 (포커스) */
+.win95-button.default {
+    border: 3px solid var(--win95-dark-shadow);
+}
+
+/* ========================================
+   윈도우
+   ======================================== */
+.win95-window {
+    background: var(--win95-bg);
+    border: 2px solid;
+    border-color: var(--win95-highlight) var(--win95-dark-shadow) var(--win95-dark-shadow) var(--win95-highlight);
+    box-shadow:
+        inset 1px 1px 0 var(--win95-light),
+        inset -1px -1px 0 var(--win95-shadow),
+        2px 2px 10px rgba(0, 0, 0, 0.3);
+}
+
+/* 타이틀바 */
+.win95-titlebar {
+    display: flex;
+    align-items: center;
+    height: 18px;
+    padding: 2px 3px;
+    background: linear-gradient(90deg, var(--win95-title-active), #1084D0);
+    color: var(--win95-title-text);
+    font-family: 'MS Sans Serif', 'Segoe UI', Tahoma, sans-serif;
+    font-size: 11px;
+    font-weight: bold;
+    user-select: none;
+    cursor: move;
+}
+
+.win95-titlebar.inactive {
+    background: linear-gradient(90deg, var(--win95-title-inactive), #B5B5B5);
+}
+
+.win95-titlebar-icon {
+    width: 16px;
+    height: 16px;
+    margin-right: 4px;
+}
+
+.win95-titlebar-title {
+    flex: 1;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.win95-titlebar-buttons {
+    display: flex;
+    gap: 2px;
+    margin-left: auto;
+}
+
+/* 타이틀바 버튼 */
+.win95-titlebar-btn {
+    width: 16px;
+    height: 14px;
+    background: var(--win95-bg);
+    border: 2px solid;
+    border-color: var(--win95-highlight) var(--win95-dark-shadow) var(--win95-dark-shadow) var(--win95-highlight);
+    box-shadow: inset -1px -1px 0 var(--win95-shadow), inset 1px 1px 0 var(--win95-light);
+    font-family: 'Marlett', sans-serif;
+    font-size: 9px;
+    line-height: 10px;
+    text-align: center;
+    cursor: pointer;
+}
+
+.win95-titlebar-btn:active {
+    border-color: var(--win95-dark-shadow) var(--win95-highlight) var(--win95-highlight) var(--win95-dark-shadow);
+    box-shadow: inset 1px 1px 0 var(--win95-shadow);
+}
+
+.win95-btn-minimize::before { content: '0'; }
+.win95-btn-maximize::before { content: '1'; }
+.win95-btn-close::before { content: 'r'; }
+
+/* 윈도우 본문 */
+.win95-window-content {
+    padding: 8px;
+}
+
+/* 메뉴바 */
+.win95-menubar {
+    display: flex;
+    height: 20px;
+    padding: 0 2px;
+    background: var(--win95-bg);
+    border-bottom: 1px solid var(--win95-shadow);
+}
+
+.win95-menu-item {
+    padding: 2px 8px;
+    font-family: 'MS Sans Serif', 'Segoe UI', Tahoma, sans-serif;
+    font-size: 11px;
+    cursor: pointer;
+}
+
+.win95-menu-item:hover {
+    background: var(--win95-selection);
+    color: var(--win95-selection-text);
+}
+
+/* 상태바 */
+.win95-statusbar {
+    display: flex;
+    height: 20px;
+    padding: 2px;
+    background: var(--win95-bg);
+    border-top: 1px solid var(--win95-shadow);
+}
+
+.win95-statusbar-item {
+    padding: 0 4px;
+    border: 1px solid;
+    border-color: var(--win95-shadow) var(--win95-highlight) var(--win95-highlight) var(--win95-shadow);
+    font-family: 'MS Sans Serif', 'Segoe UI', Tahoma, sans-serif;
+    font-size: 11px;
+}
+
+/* ========================================
+   입력 필드
+   ======================================== */
+.win95-input {
+    height: 21px;
+    padding: 2px 4px;
+    background: #FFFFFF;
+    border: 2px solid;
+    border-color: var(--win95-shadow) var(--win95-highlight) var(--win95-highlight) var(--win95-shadow);
+    box-shadow: inset 1px 1px 0 var(--win95-dark-shadow);
+    font-family: 'MS Sans Serif', 'Segoe UI', Tahoma, sans-serif;
+    font-size: 11px;
+    outline: none;
+}
+
+.win95-input:focus {
+    outline: none;
+}
+
+.win95-input:disabled {
+    background: var(--win95-bg);
+    color: var(--win95-disabled);
+}
+
+/* 텍스트영역 */
+.win95-textarea {
+    padding: 4px;
+    background: #FFFFFF;
+    border: 2px solid;
+    border-color: var(--win95-shadow) var(--win95-highlight) var(--win95-highlight) var(--win95-shadow);
+    box-shadow: inset 1px 1px 0 var(--win95-dark-shadow);
+    font-family: 'Courier New', monospace;
+    font-size: 12px;
+    resize: both;
+    outline: none;
+}
+
+/* ========================================
+   체크박스 & 라디오 버튼
+   ======================================== */
+.win95-checkbox,
+.win95-radio {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-family: 'MS Sans Serif', 'Segoe UI', Tahoma, sans-serif;
+    font-size: 11px;
+    cursor: pointer;
+}
+
+.win95-checkbox input,
+.win95-radio input {
+    display: none;
+}
+
+.win95-checkbox-box {
+    width: 13px;
+    height: 13px;
+    background: #FFFFFF;
+    border: 2px solid;
+    border-color: var(--win95-shadow) var(--win95-highlight) var(--win95-highlight) var(--win95-shadow);
+    box-shadow: inset 1px 1px 0 var(--win95-dark-shadow);
+}
+
+.win95-checkbox input:checked + .win95-checkbox-box::after {
+    content: '';
+    display: block;
+    width: 7px;
+    height: 7px;
+    margin: 1px;
+    background: var(--win95-text);
+    clip-path: polygon(14% 44%, 0 65%, 50% 100%, 100% 16%, 80% 0%, 43% 62%);
+}
+
+.win95-radio-circle {
+    width: 12px;
+    height: 12px;
+    background: #FFFFFF;
+    border: 2px solid;
+    border-color: var(--win95-shadow) var(--win95-highlight) var(--win95-highlight) var(--win95-shadow);
+    border-radius: 50%;
+    box-shadow: inset 1px 1px 0 var(--win95-dark-shadow);
+}
+
+.win95-radio input:checked + .win95-radio-circle::after {
+    content: '';
+    display: block;
+    width: 4px;
+    height: 4px;
+    margin: 2px;
+    background: var(--win95-text);
+    border-radius: 50%;
+}
+
+/* ========================================
+   프로그레스바
+   ======================================== */
+.win95-progress {
+    height: 16px;
+    background: var(--win95-bg);
+    border: 2px solid;
+    border-color: var(--win95-shadow) var(--win95-highlight) var(--win95-highlight) var(--win95-shadow);
+    box-shadow: inset 1px 1px 0 var(--win95-dark-shadow);
+}
+
+.win95-progress-bar {
+    height: 100%;
+    background: repeating-linear-gradient(
+        90deg,
+        var(--win95-title-active) 0px,
+        var(--win95-title-active) 8px,
+        transparent 8px,
+        transparent 10px
+    );
+}
+
+/* ========================================
+   스크롤바
+   ======================================== */
+.win95-scrollbar {
+    width: 16px;
+    background: repeating-linear-gradient(
+        45deg,
+        var(--win95-bg) 0px,
+        var(--win95-bg) 2px,
+        var(--win95-light) 2px,
+        var(--win95-light) 4px
+    );
+}
+
+.win95-scrollbar-thumb {
+    background: var(--win95-bg);
+    border: 2px solid;
+    border-color: var(--win95-highlight) var(--win95-dark-shadow) var(--win95-dark-shadow) var(--win95-highlight);
+    box-shadow: inset -1px -1px 0 var(--win95-shadow), inset 1px 1px 0 var(--win95-light);
+}
+
+.win95-scrollbar-arrow {
+    width: 16px;
+    height: 16px;
+    background: var(--win95-bg);
+    border: 2px solid;
+    border-color: var(--win95-highlight) var(--win95-dark-shadow) var(--win95-dark-shadow) var(--win95-highlight);
+    box-shadow: inset -1px -1px 0 var(--win95-shadow), inset 1px 1px 0 var(--win95-light);
+}
+
+/* ========================================
+   탭
+   ======================================== */
+.win95-tabs {
+    display: flex;
+    gap: 0;
+    margin-bottom: -2px;
+}
+
+.win95-tab {
+    padding: 4px 12px;
+    background: var(--win95-bg);
+    border: 2px solid;
+    border-color: var(--win95-highlight) var(--win95-shadow) var(--win95-bg) var(--win95-highlight);
+    border-bottom: none;
+    font-family: 'MS Sans Serif', 'Segoe UI', Tahoma, sans-serif;
+    font-size: 11px;
+    cursor: pointer;
+}
+
+.win95-tab.active {
+    position: relative;
+    z-index: 1;
+    padding-bottom: 6px;
+    margin-bottom: -2px;
+    border-bottom: 2px solid var(--win95-bg);
+}
+
+.win95-tab-content {
+    padding: 8px;
+    background: var(--win95-bg);
+    border: 2px solid;
+    border-color: var(--win95-highlight) var(--win95-shadow) var(--win95-shadow) var(--win95-highlight);
+}
+
+/* ========================================
+   그룹박스
+   ======================================== */
+.win95-groupbox {
+    margin: 8px 0;
+    padding: 12px 8px 8px;
+    border: 2px solid;
+    border-color: var(--win95-shadow) var(--win95-highlight) var(--win95-highlight) var(--win95-shadow);
+}
+
+.win95-groupbox-title {
+    position: absolute;
+    top: -8px;
+    left: 8px;
+    padding: 0 4px;
+    background: var(--win95-bg);
+    font-family: 'MS Sans Serif', 'Segoe UI', Tahoma, sans-serif;
+    font-size: 11px;
+}
+
+/* ========================================
+   리스트
+   ======================================== */
+.win95-listbox {
+    background: #FFFFFF;
+    border: 2px solid;
+    border-color: var(--win95-shadow) var(--win95-highlight) var(--win95-highlight) var(--win95-shadow);
+    box-shadow: inset 1px 1px 0 var(--win95-dark-shadow);
+    overflow-y: auto;
+}
+
+.win95-listbox-item {
+    padding: 2px 4px;
+    font-family: 'MS Sans Serif', 'Segoe UI', Tahoma, sans-serif;
+    font-size: 11px;
+    cursor: pointer;
+}
+
+.win95-listbox-item:hover {
+    background: var(--win95-selection);
+    color: var(--win95-selection-text);
+}
+
+.win95-listbox-item.selected {
+    background: var(--win95-selection);
+    color: var(--win95-selection-text);
+}
+
+/* ========================================
+   슬라이더
+   ======================================== */
+.win95-slider {
+    display: flex;
+    align-items: center;
+    height: 21px;
+}
+
+.win95-slider-track {
+    flex: 1;
+    height: 4px;
+    background: var(--win95-bg);
+    border: 1px solid;
+    border-color: var(--win95-shadow) var(--win95-highlight) var(--win95-highlight) var(--win95-shadow);
+}
+
+.win95-slider-thumb {
+    width: 11px;
+    height: 21px;
+    background: var(--win95-bg);
+    border: 2px solid;
+    border-color: var(--win95-highlight) var(--win95-dark-shadow) var(--win95-dark-shadow) var(--win95-highlight);
+    box-shadow: inset -1px -1px 0 var(--win95-shadow), inset 1px 1px 0 var(--win95-light);
+    cursor: ew-resize;
+}
+
+/* ========================================
+   툴팁
+   ======================================== */
+.win95-tooltip {
+    position: absolute;
+    padding: 2px 4px;
+    background: #FFFFCC;
+    border: 1px solid var(--win95-dark-shadow);
+    font-family: 'MS Sans Serif', 'Segoe UI', Tahoma, sans-serif;
+    font-size: 11px;
+    white-space: nowrap;
+    z-index: 1000;
+}
+
+/* ========================================
+   다이얼로그
+   ======================================== */
+.win95-dialog-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.3);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 999;
+}
+
+.win95-dialog {
+    min-width: 300px;
+}
+
+.win95-dialog-content {
+    display: flex;
+    gap: 16px;
+    padding: 16px;
+}
+
+.win95-dialog-icon {
+    width: 32px;
+    height: 32px;
+}
+
+.win95-dialog-buttons {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+    padding: 8px;
+    border-top: 1px solid var(--win95-shadow);
+}

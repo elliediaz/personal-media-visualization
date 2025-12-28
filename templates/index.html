@@ -63,13 +63,36 @@
             <h2>시각화</h2>
 
             <div class="viz-options">
-                <button class="viz-option active" data-type="spectrogram">스펙트로그램</button>
-                <button class="viz-option" data-type="waveform">파형</button>
-                <button class="viz-option" data-type="spectrum">스펙트럼</button>
-                <button class="viz-option" data-type="mel_spectrogram">Mel 스펙트로그램</button>
-                <button class="viz-option" data-type="particles">파티클</button>
-                <button class="viz-option" data-type="circles">원형</button>
-                <button class="viz-option" data-type="waves">웨이브</button>
+                <!-- 통계적 시각화 -->
+                <div class="viz-option-group">
+                    <span class="viz-option-label">통계</span>
+                    <button class="viz-option active" data-type="spectrogram">스펙트로그램</button>
+                    <button class="viz-option" data-type="waveform">파형</button>
+                    <button class="viz-option" data-type="spectrum">스펙트럼</button>
+                    <button class="viz-option" data-type="mel_spectrogram">Mel</button>
+                </div>
+                <!-- 예술적 시각화 -->
+                <div class="viz-option-group">
+                    <span class="viz-option-label">예술</span>
+                    <button class="viz-option" data-type="particles">파티클</button>
+                    <button class="viz-option" data-type="circles">원형</button>
+                    <button class="viz-option" data-type="waves">웨이브</button>
+                </div>
+                <!-- 사이키델릭 시각화 -->
+                <div class="viz-option-group">
+                    <span class="viz-option-label">사이키델릭</span>
+                    <button class="viz-option" data-type="fractal">프랙탈</button>
+                    <button class="viz-option" data-type="tunnel">터널</button>
+                    <button class="viz-option" data-type="kaleidoscope">만화경</button>
+                    <button class="viz-option" data-type="oscilloscope">오실로스코프</button>
+                </div>
+                <!-- 실험적 효과 -->
+                <div class="viz-option-group">
+                    <span class="viz-option-label">실험</span>
+                    <button class="viz-option" data-type="glitch">글리치</button>
+                    <button class="viz-option" data-type="ascii">ASCII</button>
+                    <button class="viz-option" data-type="matrix_rain">매트릭스</button>
+                </div>
             </div>
 
             <div class="crt-controls" style="margin: 1rem 0; text-align: center;">
@@ -133,6 +156,7 @@
         <p>MIT License</p>
     </footer>
 
+    <script src="/static/js/retro/performance-monitor.js"></script>
     <script src="/static/js/retro/crt-renderer.js"></script>
     <script src="/static/js/retro/ui/retro-window.js"></script>
     <script src="/static/js/retro/ui/retro-button.js"></script>

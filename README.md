@@ -32,7 +32,13 @@
 - 프랙탈 시각화
 - 커스텀 예술 알고리즘
 
-#### 고급 3D/4D 시각화
+#### 레트로/사이키델릭 시각화
+- CRT 모니터 효과
+- 프랙탈, 만화경, 터널 시각화
+- 글리치 아트, ASCII 렌더러
+- 매트릭스 레인 효과
+
+#### 고급 3D/4D 시각화 (계획됨)
 - 3D 스펙트로그램 (시간-주파수-진폭)
 - 3D 오디오 공간 시각화
 - 포인트 클라우드 렌더링
@@ -45,76 +51,6 @@
 - 분석 데이터 제공
 - 시각화 렌더링 서비스
 
-### 5. 연구 및 실험
-- 3D/4D 시각화 기법 탐구
-- 미디어 아트 알고리즘 연구
-- 맞춤형 시각화 개발
-- VR/AR 지원 (선택사항)
-
-## 프로젝트 구조
-
-```
-personal-media-visualization/
-├── src/
-│   ├── core/              # 핵심 시스템 (설정, 예외, 로깅)
-│   ├── audio/             # 오디오 재생 및 I/O
-│   ├── analysis/          # 오디오 분석 및 특성 추출
-│   ├── visualization/     # 시각화 모듈
-│   │   ├── statistical/   # 통계적 시각화
-│   │   ├── artistic/      # 예술적 시각화
-│   │   └── advanced/      # 3D/4D 시각화
-│   ├── api/               # REST API 및 WebSocket
-│   └── utils/             # 유틸리티 함수
-├── tests/                 # 테스트
-│   ├── unit/              # 단위 테스트
-│   └── integration/       # 통합 테스트
-├── docs/                  # 문서
-├── data/                  # 데이터 (샘플, 캐시)
-├── output/                # 출력 (렌더링, 내보내기)
-├── config/                # 설정 파일
-└── scripts/               # 유틸리티 스크립트
-```
-
-## 기술 스택
-
-### 오디오 처리
-- **librosa**: 오디오 분석 및 특성 추출
-- **soundfile/pydub**: 오디오 I/O
-- **pygame/pyaudio**: 실시간 재생
-- **essentia**: 고급 오디오 분석
-- **aubio**: 비트 감지 및 피치 추적
-
-### 시각화
-- **matplotlib/seaborn**: 통계적 플롯
-- **plotly**: 인터랙티브 시각화
-- **pygame**: 실시간 2D 렌더링
-- **vispy/moderngl**: OpenGL 기반 3D 시각화
-- **Open3D**: 3D 포인트 클라우드
-
-### API 및 통합
-- **FastAPI**: REST API 서버
-- **WebSockets**: 실시간 데이터 스트리밍
-- **Redis**: 캐시 및 메시지 브로커
-
-### 프론트엔드 (선택사항)
-- **React + TypeScript**
-- **Three.js**: 3D 웹 시각화
-- **D3.js**: 데이터 기반 시각화
-
-## 개발 단계
-
-프로젝트는 7개의 단계로 나누어 개발됩니다:
-
-1. **Phase 1**: 기초 및 기본 재생
-2. **Phase 2**: 오디오 분석 및 메타데이터 추출
-3. **Phase 3**: 통계적 시각화
-4. **Phase 4**: 예술적 시각화
-5. **Phase 5**: 외부 API 통합
-6. **Phase 6**: 고급 3D/4D 시각화
-7. **Phase 7**: 통합 및 최적화
-
-각 단계는 독립적으로 개발, 테스트, 커밋되며 최종적으로 하나의 통합 솔루션으로 합쳐집니다.
-
 ## 빠른 시작
 
 ### 실행 스크립트 사용 (권장)
@@ -126,17 +62,43 @@ personal-media-visualization/
 ./run.sh test         # 테스트 실행
 ./run.sh help         # 도움말
 
-# Windows
+# Windows CMD
 run.bat               # API 서버 시작
 run.bat dev           # 개발 모드
 run.bat test          # 테스트 실행
 run.bat help          # 도움말
+
+# Windows PowerShell
+.\run.ps1             # API 서버 시작
+.\run.ps1 dev         # 개발 모드
+.\run.ps1 test        # 테스트 실행
+.\run.ps1 help        # 도움말
 ```
 
 서버 시작 후 접속:
 - 웹 인터페이스: http://localhost:8000/web
 - API 문서 (Swagger): http://localhost:8000/docs
 - API 문서 (ReDoc): http://localhost:8000/redoc
+
+### 실행 스크립트 명령어
+
+| 명령어 | 설명 |
+|--------|------|
+| `server` | API 서버 시작 (기본값) |
+| `dev` | 개발 모드로 서버 시작 (자동 리로드) |
+| `test` | 테스트 실행 |
+| `lint` | 코드 품질 검사 (ruff, black --check) |
+| `format` | 코드 포매팅 (black, ruff --fix) |
+| `check` | 전체 검사 (lint + type check) |
+| `install` | 의존성 설치 |
+| `install-dev` | 개발 의존성 설치 |
+| `build` | 프로젝트 빌드/패키징 |
+| `clean` | 캐시 및 임시 파일 정리 |
+| `docs` | 문서 생성 |
+| `benchmark` | 벤치마크 실행 |
+| `coverage` | 커버리지 리포트 생성 |
+| `info` | 시스템 정보 출력 |
+| `help` | 도움말 표시 |
 
 ## 설치 방법
 
@@ -163,18 +125,16 @@ pip install -r requirements.txt
 pip install -r requirements-dev.txt
 ```
 
-### 개발 환경 설정
+또는 실행 스크립트 사용:
 
 ```bash
-# pre-commit 훅 설치
-pre-commit install
+# Linux/macOS
+./run.sh install       # 의존성 설치
+./run.sh install-dev   # 개발 의존성 설치
 
-# 테스트 실행
-pytest
-
-# 코드 포맷팅
-black src tests
-ruff check src tests
+# Windows
+run.bat install        # 의존성 설치
+run.bat install-dev    # 개발 의존성 설치
 ```
 
 ## 사용 방법
@@ -221,9 +181,10 @@ visualizer.render(features, output="spectrogram.png")
 # API 서버 시작
 python run_api_server.py
 
-# API 문서 확인
-# Swagger UI: http://localhost:8000/docs
-# ReDoc: http://localhost:8000/redoc
+# 또는 실행 스크립트 사용
+./run.sh        # Linux/macOS
+run.bat         # Windows CMD
+.\run.ps1       # Windows PowerShell
 ```
 
 **API 엔드포인트:**
@@ -234,30 +195,37 @@ python run_api_server.py
 - `/ws/audio/{audio_id}` - 오디오 스트림 (WebSocket)
 - `/ws/features/{audio_id}` - 특성 스트림 (WebSocket)
 
-**Python 클라이언트 예제:**
+## 프로젝트 구조
 
-```python
-from pathlib import Path
-from docs.examples.api_client_examples import AudioVisualizationClient
-
-with AudioVisualizationClient() as client:
-    # 오디오 업로드
-    result = client.upload_audio(Path("audio.mp3"))
-    audio_id = result["audio_id"]
-
-    # 분석 요청
-    analysis = client.analyze_audio(audio_id)
-    completed = client.wait_for_analysis(analysis["analysis_id"])
-
-    # 시각화 렌더링
-    viz = client.render_visualization(
-        viz_type="particles",
-        analysis_id=completed["analysis_id"],
-        params={"num_particles": 3000}
-    )
-
-    # 다운로드
-    client.download_visualization(viz["viz_id"], Path("output.png"))
+```
+personal-media-visualization/
+├── src/
+│   ├── core/              # 핵심 시스템 (설정, 예외, 로깅)
+│   ├── audio/             # 오디오 재생 및 I/O
+│   ├── analysis/          # 오디오 분석 및 특성 추출
+│   ├── visualization/     # 시각화 모듈
+│   │   ├── statistical/   # 통계적 시각화
+│   │   ├── artistic/      # 예술적 시각화
+│   │   ├── retro/         # 레트로/CRT 효과
+│   │   ├── animation/     # 애니메이션 및 내보내기
+│   │   └── advanced/      # 3D/4D 시각화 (예정)
+│   ├── api/               # REST API 및 WebSocket
+│   ├── cli/               # CLI 인터페이스
+│   └── utils/             # 유틸리티 함수
+├── tests/                 # 테스트
+│   ├── unit/              # 단위 테스트
+│   ├── integration/       # 통합 테스트
+│   └── benchmarks/        # 벤치마크
+├── docs/                  # 문서
+├── data/                  # 데이터 (샘플, 캐시)
+├── output/                # 출력 (렌더링, 내보내기)
+├── config/                # 설정 파일
+├── static/                # 정적 파일 (CSS, JS)
+├── templates/             # HTML 템플릿
+├── run.sh                 # Linux/macOS 실행 스크립트
+├── run.bat                # Windows CMD 실행 스크립트
+├── run.ps1                # Windows PowerShell 실행 스크립트
+└── run_api_server.py      # API 서버 진입점
 ```
 
 ## 설정
@@ -265,9 +233,6 @@ with AudioVisualizationClient() as client:
 설정 파일은 `config/` 디렉토리에 있습니다:
 
 - `default.yaml`: 기본 설정
-- `audio.yaml`: 오디오 관련 설정
-- `visualization.yaml`: 시각화 설정
-- `api.yaml`: API 서버 설정
 
 환경 변수를 통해 설정을 재정의할 수 있습니다:
 
@@ -276,77 +241,75 @@ export PMV_AUDIO_SAMPLE_RATE=48000
 export PMV_API_PORT=8080
 ```
 
-## 테스트
+실행 스크립트에서 사용할 수 있는 환경 변수:
+
+| 변수 | 설명 | 기본값 |
+|------|------|--------|
+| `PMV_HOST` | 서버 호스트 | 0.0.0.0 |
+| `PMV_PORT` | 서버 포트 | 8000 |
+| `PYTHON` | Python 실행 파일 | python3/python |
+
+## 개발
+
+### 개발 환경 설정
+
+```bash
+# pre-commit 훅 설치
+pre-commit install
+
+# 코드 포매팅
+./run.sh format    # 또는 run.bat format
+
+# 코드 품질 검사
+./run.sh lint      # 또는 run.bat lint
+
+# 전체 검사 (lint + type check)
+./run.sh check     # 또는 run.bat check
+```
+
+### 테스트
 
 ```bash
 # 모든 테스트 실행
-pytest
+./run.sh test
 
-# 커버리지 포함
-pytest --cov=src --cov-report=html
+# 커버리지 리포트
+./run.sh coverage
 
 # 특정 테스트만 실행
-pytest tests/unit/test_player.py
+./run.sh test -k player
 
-# 성능 벤치마크
-pytest tests/benchmarks/ --benchmark-only
+# 벤치마크
+./run.sh benchmark
 ```
 
-## 기여 가이드라인
+## 개발 단계
 
-### 코드 스타일
-- PEP 8 준수
-- 모든 함수에 타입 힌트 사용
-- 한글로 된 docstring (Google 스타일)
-- `black`으로 포맷팅
-- `ruff`로 린팅
+프로젝트는 7개의 단계로 나누어 개발됩니다:
 
-### 커밋 메시지
-```
-타입: 간단한 설명
+- [x] Phase 1: 기초 및 기본 재생
+- [x] Phase 2: 오디오 분석
+- [x] Phase 3: 통계적 시각화
+- [x] Phase 4: 예술적 시각화
+- [x] Phase 5: API 통합
+- [x] Phase 5.5: 웹 인터페이스, CLI 완성, 레트로/사이키델릭 시각화
+- [ ] Phase 6: 3D/4D 시각화
+- [ ] Phase 7: 최종 통합 및 최적화
 
-상세 설명 (필요시)
+## 성능 최적화
 
-관련 이슈: #123
-```
+### 라즈베리파이 지원
+실행 스크립트는 라즈베리파이 환경을 자동으로 감지하여 최적화 모드를 적용합니다.
 
-**타입:**
-- `feat`: 새로운 기능
-- `fix`: 버그 수정
-- `refactor`: 코드 리팩토링
-- `test`: 테스트 추가/수정
-- `docs`: 문서 수정
-- `style`: 코드 포맷팅
-- `perf`: 성능 개선
-- `chore`: 기타 변경사항
-
-### Pull Request
-1. Feature 브랜치 생성
-2. 변경사항 커밋
-3. 테스트 추가/업데이트
-4. Pull Request 생성
-5. 코드 리뷰 대기
-
-## 성능 목표
-
-### 실시간 처리
+### 성능 목표
 - 오디오 지연: <50ms
 - 시각화 FPS: 60 FPS (2D), 30-60 FPS (3D)
 - 특성 추출: 표준 특성에 대해 실시간
 - API 응답 시간: <100ms (처리 시간 제외)
 
-### 리소스 사용
-- 메모리: 일반 사용 시 <2GB
-- CPU: 현대적인 쿼드코어에서 <50%
-- GPU: 사용 가능한 VRAM의 효율적 사용
-
 ## 라이선스
 
 MIT License
-
-## 문의
-
-프로젝트 관련 문의사항은 이슈를 통해 남겨주세요.
 
 ## 감사의 말
 
@@ -356,17 +319,3 @@ MIT License
 - pygame
 - FastAPI
 - 그 외 많은 훌륭한 라이브러리들
-
-## 로드맵
-
-- [x] Phase 1: 기초 및 기본 재생
-- [x] Phase 2: 오디오 분석
-- [x] Phase 3: 통계적 시각화
-- [x] Phase 4: 예술적 시각화
-- [x] Phase 5: API 통합
-- [x] Phase 5.5: 웹 인터페이스 및 CLI 완성
-- [ ] Phase 6: 3D/4D 시각화
-- [ ] Phase 7: 최종 통합 및 최적화
-- [ ] 머신러닝 기반 분류
-- [ ] 모바일 앱 통합
-- [ ] VR/AR 지원

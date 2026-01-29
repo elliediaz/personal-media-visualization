@@ -195,9 +195,6 @@ cython_debug/
 .pypirc
 
 # Cursor
-#  Cursor is an AI-powered code editor. `.cursorignore` specifies files/directories to
-#  exclude from AI features like autocomplete and code analysis. Recommended for sensitive data
-#  refer to https://docs.cursor.com/context/ignore-files
 .cursorignore
 .cursorindexingignore
 
@@ -205,13 +202,6 @@ cython_debug/
 marimo/_static/
 marimo/_lsp/
 __marimo__/
-
-# Claude Code 관련 파일 (버전 관리 제외)
-CLAUDE.md
-CLAUDE.MD
-.claude/
-claude_*.md
-*_claude_*.md
 
 # 프로젝트 특화 제외 항목
 # 오디오 파일

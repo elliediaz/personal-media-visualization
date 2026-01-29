@@ -411,6 +411,27 @@ run_coverage() {
     success "커버리지 리포트 생성 완료 - htmlcov/index.html 확인"
 }
 
+run_gui() {
+    print_logo
+    check_python
+    activate_venv
+
+    echo -e "${BOLD}메인프레임 GUI 시작${NC}"
+    echo ""
+    info "80~90년대 군사용 메인프레임 스타일 GUI"
+    info "인광체: ${2:-green}"
+    echo ""
+    info "단축키:"
+    info "  F1  - 파형 모드"
+    info "  F2  - 오실로스코프 모드"
+    info "  F3  - CRT 효과 토글"
+    info "  F4  - 인광체 색상 변경"
+    info "  ESC - 종료"
+    echo ""
+
+    $PYTHON run_gui.py "${@:2}"
+}
+
 show_info() {
     print_logo
 
@@ -481,6 +502,7 @@ show_help() {
     echo -e "${BOLD}서버 명령어:${NC}"
     echo "  server      API 서버 시작 (기본값)"
     echo "  dev         개발 모드로 서버 시작 (자동 리로드)"
+    echo "  gui         메인프레임 스타일 GUI 실행"
     echo ""
     echo -e "${BOLD}개발 명령어:${NC}"
     echo "  test        테스트 실행"
@@ -521,6 +543,10 @@ case "${1:-server}" in
         ;;
     dev)
         start_dev_server
+        ;;
+    gui)
+        shift
+        run_gui "$@"
         ;;
     test)
         shift

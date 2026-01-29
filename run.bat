@@ -61,6 +61,7 @@ REM 명령어 분기
 if "%1"=="" goto server
 if "%1"=="server" goto server
 if "%1"=="dev" goto dev
+if "%1"=="gui" goto gui
 if "%1"=="test" goto test
 if "%1"=="lint" goto lint
 if "%1"=="format" goto format
@@ -160,6 +161,26 @@ echo %GREEN%[INFO]%NC% 종료하려면 Ctrl+C를 누르세요.
 echo.
 
 %PYTHON% -m uvicorn src.api.app:app --host %PMV_HOST% --port %PMV_PORT% --reload
+goto end
+
+:gui
+call :logo
+call :check_python
+call :activate_venv
+
+echo %BOLD%메인프레임 GUI 시작%NC%
+echo.
+echo %GREEN%[INFO]%NC% 80~90년대 군사용 메인프레임 스타일 GUI
+echo.
+echo %GREEN%[INFO]%NC% 단축키:
+echo %GREEN%[INFO]%NC%   F1  - 파형 모드
+echo %GREEN%[INFO]%NC%   F2  - 오실로스코프 모드
+echo %GREEN%[INFO]%NC%   F3  - CRT 효과 토글
+echo %GREEN%[INFO]%NC%   F4  - 인광체 색상 변경
+echo %GREEN%[INFO]%NC%   ESC - 종료
+echo.
+
+%PYTHON% run_gui.py %2 %3 %4 %5
 goto end
 
 :test
@@ -407,6 +428,7 @@ echo.
 echo %BOLD%서버 명령어:%NC%
 echo   server      API 서버 시작 (기본값)
 echo   dev         개발 모드로 서버 시작 (자동 리로드)
+echo   gui         메인프레임 스타일 GUI 실행
 echo.
 echo %BOLD%개발 명령어:%NC%
 echo   test        테스트 실행

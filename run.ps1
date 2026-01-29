@@ -25,7 +25,7 @@
 
 param(
     [Parameter(Position=0)]
-    [ValidateSet('server', 'dev', 'test', 'lint', 'format', 'check', 'install', 'install-dev', 'build', 'clean', 'docs', 'benchmark', 'coverage', 'info', 'help')]
+    [ValidateSet('server', 'dev', 'gui', 'test', 'lint', 'format', 'check', 'install', 'install-dev', 'build', 'clean', 'docs', 'benchmark', 'coverage', 'info', 'help')]
     [string]$Command = 'server',
 
     [Parameter(Position=1, ValueFromRemainingArguments=$true)]
@@ -192,6 +192,32 @@ function Start-DevServer {
     Write-Host ""
 
     & $PYTHON -m uvicorn src.api.app:app --host $PMV_HOST --port $PMV_PORT --reload
+}
+
+# ===== 메인프레임 GUI 시작 =====
+function Start-Gui {
+    Show-Logo
+    Test-Python
+    Enable-Venv
+
+    Write-Host "메인프레임 GUI 시작" -ForegroundColor White
+    Write-Host ""
+    Write-Info "80~90년대 군사용 메인프레임 스타일 GUI"
+    Write-Host ""
+    Write-Info "단축키:"
+    Write-Info "  F1  - 파형 모드"
+    Write-Info "  F2  - 오실로스코프 모드"
+    Write-Info "  F3  - CRT 효과 토글"
+    Write-Info "  F4  - 인광체 색상 변경"
+    Write-Info "  ESC - 종료"
+    Write-Host ""
+
+    if ($Arguments) {
+        & $PYTHON run_gui.py $Arguments
+    }
+    else {
+        & $PYTHON run_gui.py
+    }
 }
 
 # ===== 테스트 실행 =====
@@ -466,6 +492,7 @@ function Show-Help {
     Write-Host "서버 명령어:" -ForegroundColor White
     Write-Host "  server      API 서버 시작 (기본값)"
     Write-Host "  dev         개발 모드로 서버 시작 (자동 리로드)"
+    Write-Host "  gui         메인프레임 스타일 GUI 실행"
     Write-Host ""
 
     Write-Host "개발 명령어:" -ForegroundColor White
@@ -508,6 +535,7 @@ function Show-Help {
 switch ($Command) {
     'server'      { Start-Server }
     'dev'         { Start-DevServer }
+    'gui'         { Start-Gui }
     'test'        { Invoke-Tests }
     'lint'        { Invoke-Lint }
     'format'      { Invoke-Format }

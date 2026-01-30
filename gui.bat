@@ -86,6 +86,8 @@ if %HELP%==1 (
     echo    F3          CRT 효과 토글
     echo    F4          인광체 색상 변경
     echo    F5          설정 화면 (오디오 입력 선택)
+    echo    F11         전체 창 전체 화면 토글
+    echo    F12         시각화 전용 전체 화면 토글
     echo    SPACE       재생/일시정지 (파일 모드)
     echo    ESC         종료
     echo.
@@ -117,6 +119,8 @@ echo     F1/F2   - 시각화 이전/다음 (52개 스타일)
 echo     F3      - CRT 효과 토글
 echo     F4      - 인광체 색상 변경
 echo     F5      - 설정 (오디오 입력 선택)
+echo     F11     - 전체 창 전체 화면
+echo     F12     - 시각화 전용 전체 화면
 echo     SPACE   - 재생/일시정지
 echo     ESC     - 종료
 echo.

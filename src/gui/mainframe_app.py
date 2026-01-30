@@ -518,6 +518,11 @@ class MainframeApp:
         self.running = False
         self.fps = 30
 
+        # 전체 화면 상태
+        self._fullscreen = False
+        self._windowed_size = (width, height)
+        self._viz_fullscreen = False
+
         # CRT 효과
         self.crt = CRTEffect(width, height) if crt_effects else None
 
@@ -726,7 +731,11 @@ class MainframeApp:
     def _handle_keydown(self, event):
         """키 입력 처리"""
         if event.key == K_ESCAPE:
-            self.running = False
+            if self._viz_fullscreen:
+                # 시각화 전용 모드에서 복귀
+                self._toggle_viz_fullscreen()
+            else:
+                self.running = False
 
         elif event.key == K_F1:
             # 이전 시각화
@@ -758,6 +767,14 @@ class MainframeApp:
             # 설정 화면 열기
             self.settings_screen.show()
             self.log("SETTINGS OPENED", "INFO")
+
+        elif event.key == K_F11:
+            # 전체 창 전체 화면 토글
+            self._toggle_fullscreen()
+
+        elif event.key == K_F12:
+            # 시각화 전용 전체 화면 토글
+            self._toggle_viz_fullscreen()
 
         elif event.key == K_SPACE:
             # 일시정지/재개
@@ -815,13 +832,80 @@ class MainframeApp:
                 self.log("INVALID DEVICE", "ERROR")
             self.settings_screen.hide()
 
+    def _toggle_fullscreen(self):
+        """전체 창 전체 화면 토글"""
+        self._fullscreen = not self._fullscreen
+
+        if self._fullscreen:
+            # 현재 창 크기 저장
+            self._windowed_size = (self.width, self.height)
+            # 전체 화면으로 전환
+            self.screen = pygame.display.set_mode((0, 0), FULLSCREEN)
+            self.width, self.height = self.screen.get_size()
+            self.log("FULLSCREEN MODE", "INFO")
+        else:
+            # 창 모드로 복귀
+            self.width, self.height = self._windowed_size
+            self.screen = pygame.display.set_mode((self.width, self.height))
+            self.log("WINDOWED MODE", "INFO")
+
+        # 버퍼 및 UI 재설정
+        self.buffer = Surface((self.width, self.height))
+        if self.crt_effects_enabled:
+            self.crt = CRTEffect(self.width, self.height)
+        self._setup_ui()
+        self._setup_visualization()
+        self.settings_screen = SettingsScreen(
+            self.width, self.height, self.scheme, self.audio_manager, self.font
+        )
+
+    def _toggle_viz_fullscreen(self):
+        """시각화 전용 전체 화면 토글"""
+        self._viz_fullscreen = not self._viz_fullscreen
+
+        if self._viz_fullscreen:
+            # 시각화 전용 전체 화면 진입
+            if not self._fullscreen:
+                self._windowed_size = (self.width, self.height)
+            self.screen = pygame.display.set_mode((0, 0), FULLSCREEN)
+            self.width, self.height = self.screen.get_size()
+            self.buffer = Surface((self.width, self.height))
+            if self.crt_effects_enabled:
+                self.crt = CRTEffect(self.width, self.height)
+
+            # 시각화 영역을 전체 화면으로 확장
+            colors = self._get_colors_dict()
+            viz_id = self.viz_selector.get_current_id()
+            viz_rect = Rect(0, 0, self.width, self.height)
+            self._current_visualization = create_visualization(viz_id, viz_rect, colors)
+            self.log("VIZ FULLSCREEN MODE", "INFO")
+        else:
+            # 창 모드로 복귀
+            self.width, self.height = self._windowed_size
+            self.screen = pygame.display.set_mode((self.width, self.height))
+            self.buffer = Surface((self.width, self.height))
+            if self.crt_effects_enabled:
+                self.crt = CRTEffect(self.width, self.height)
+            self._fullscreen = False
+            self._setup_ui()
+            self._setup_visualization()
+            self.settings_screen = SettingsScreen(
+                self.width, self.height, self.scheme, self.audio_manager, self.font
+            )
+            self.log("WINDOWED MODE", "INFO")
+
     def _switch_visualization(self):
         """시각화 전환"""
         viz_id, viz_name, viz_name_kr = self.viz_selector.get_current_info()
         colors = self._get_colors_dict()
 
-        viz_width = self.width - 320
-        viz_rect = Rect(14, 72, viz_width - 28, 370)
+        if self._viz_fullscreen:
+            # 시각화 전용 모드에서는 전체 화면 크기
+            viz_rect = Rect(0, 0, self.width, self.height)
+        else:
+            viz_width = self.width - 320
+            viz_rect = Rect(14, 72, viz_width - 28, 370)
+
         self._current_visualization = create_visualization(viz_id, viz_rect, colors)
         self._update_panel_title()
         self.log(f"VIZ: {viz_name_kr.upper()}", "INFO")
@@ -857,46 +941,55 @@ class MainframeApp:
         # 버퍼 초기화
         self.buffer.fill(self.scheme.background)
 
-        # 헤더
-        self._draw_header()
-
-        # 패널들
-        self.viz_panel.draw(self.buffer, self.font)
-
-        # 메인 시각화 렌더링
+        # 오디오 데이터
         waveform = self.audio_manager.get_waveform()
         spectrum = self.audio_manager.get_spectrum()
 
-        if self._current_visualization:
-            self._current_visualization.render(
-                self.buffer, waveform, spectrum, font=self.font_small
-            )
+        if self._viz_fullscreen:
+            # 시각화 전용 모드: 시각화만 렌더링
+            if self._current_visualization:
+                self._current_visualization.render(
+                    self.buffer, waveform, spectrum, font=self.font_small
+                )
+        else:
+            # 일반 모드: 전체 UI 렌더링
+            # 헤더
+            self._draw_header()
 
-        # 스펙트럼 패널
-        self.spectrum_panel.draw(self.buffer, self.font)
-        if self._secondary_visualization:
-            self._secondary_visualization.render(
-                self.buffer, waveform, spectrum, font=self.font_small
-            )
+            # 패널들
+            self.viz_panel.draw(self.buffer, self.font)
 
-        # 사이드 패널들
-        self.status_panel.draw(self.buffer, self.font)
-        self._draw_system_status()
+            # 메인 시각화 렌더링
+            if self._current_visualization:
+                self._current_visualization.render(
+                    self.buffer, waveform, spectrum, font=self.font_small
+                )
 
-        self.file_panel.draw(self.buffer, self.font)
-        self._draw_audio_info()
+            # 스펙트럼 패널
+            self.spectrum_panel.draw(self.buffer, self.font)
+            if self._secondary_visualization:
+                self._secondary_visualization.render(
+                    self.buffer, waveform, spectrum, font=self.font_small
+                )
 
-        self.terminal_panel.draw(self.buffer, self.font)
-        self._draw_terminal()
+            # 사이드 패널들
+            self.status_panel.draw(self.buffer, self.font)
+            self._draw_system_status()
 
-        # 상태 바
-        self.status_bar.draw(self.buffer, self.font_small)
+            self.file_panel.draw(self.buffer, self.font)
+            self._draw_audio_info()
 
-        # 도움말
-        self._draw_help()
+            self.terminal_panel.draw(self.buffer, self.font)
+            self._draw_terminal()
 
-        # 설정 화면
-        self.settings_screen.draw(self.buffer)
+            # 상태 바
+            self.status_bar.draw(self.buffer, self.font_small)
+
+            # 도움말
+            self._draw_help()
+
+            # 설정 화면
+            self.settings_screen.draw(self.buffer)
 
         # CRT 효과 적용
         if self.crt_effects_enabled and self.crt:
@@ -1016,7 +1109,7 @@ class MainframeApp:
 
     def _draw_help(self):
         """도움말 그리기"""
-        help_text = "F1/F2:VIZ  F3:CRT  F4:COLOR  F5:SETTINGS  SPACE:PAUSE  ESC:EXIT"
+        help_text = "F1/F2:VIZ  F3:CRT  F4:COLOR  F5:SETTINGS  F11:FULLSCREEN  F12:VIZ ONLY  ESC:EXIT"
         text = self.font_small.render(help_text, self.scheme.dim)
         self.buffer.blit(text, (10, self.height - 45))
 

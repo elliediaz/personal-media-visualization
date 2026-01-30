@@ -240,3 +240,7 @@ Thumbs.db
 temp/
 tmp/
 *.tmp
+
+# 개발 도구 설정
+.claude/
+nul

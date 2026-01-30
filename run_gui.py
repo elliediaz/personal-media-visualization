@@ -4,22 +4,24 @@ Personal Media Visualization - 메인프레임 스타일 GUI 실행
 
 80~90년대 군사용 메인프레임/터미널 스타일의 레트로 GUI를 실행합니다.
 CRT 인광 효과, 스캔라인, 노이즈 등을 포함한 빈티지 모니터 시뮬레이션.
+52개의 다양한 시각화 스타일을 지원합니다.
 
 사용법:
     python run_gui.py [옵션]
 
 옵션:
     --phosphor, -p  : 인광체 색상 (green, amber, white, blue) [기본값: green]
-    --width, -w     : 창 너비 [기본값: 1024]
-    --height, -h    : 창 높이 [기본값: 768]
+    --width, -W     : 창 너비 [기본값: 1024]
+    --height, -H    : 창 높이 [기본값: 768]
     --no-crt        : CRT 효과 비활성화
 
 단축키:
-    F1  : 파형 모드
-    F2  : 오실로스코프 모드
-    F3  : CRT 효과 토글
-    F4  : 인광체 색상 변경
-    ESC : 종료
+    F1/F2/LEFT/RIGHT : 시각화 전환 (52개 스타일)
+    F3              : CRT 효과 토글
+    F4              : 인광체 색상 변경
+    F5              : 설정 화면 (오디오 입력 선택)
+    SPACE           : 재생/일시정지 (파일 모드)
+    ESC             : 종료
 """
 
 import sys
@@ -37,11 +39,18 @@ def main():
   white  - 화이트 (P4 인광체)
   blue   - 군사용 블루
 
+오디오 입력:
+  F5 키를 눌러 설정 화면에서 선택:
+  - DEMO MODE: 합성 파형 생성
+  - OPEN FILE: 오디오 파일 열기 (mp3, wav, flac, ogg)
+  - LOOPBACK: Windows 시스템 오디오 캡처
+  - MIC: 마이크 입력
+
 예시:
   python run_gui.py                     # 기본 실행 (그린)
   python run_gui.py -p amber            # 앰버 인광체
   python run_gui.py -p blue --no-crt    # 블루, CRT 효과 없이
-  python run_gui.py -w 1280 -h 960      # 큰 해상도
+  python run_gui.py -W 1280 -H 960      # 큰 해상도
         """
     )
 
@@ -116,7 +125,8 @@ def main():
     print("█" * 60)
     print("█                                                          █")
     print("█    MAINFRAME AUDIO VISUALIZATION SYSTEM                  █")
-    print("█    Military-Grade Terminal Emulation v1.0                █")
+    print("█    Military-Grade Terminal Emulation v2.0                █")
+    print("█    52 Visualization Styles Available                     █")
     print("█                                                          █")
     print("█" * 60)
     print()
@@ -125,11 +135,12 @@ def main():
     print(f"  CRT 효과    : {'ON' if not args.no_crt else 'OFF'}")
     print()
     print("  단축키:")
-    print("    F1  - 파형 모드")
-    print("    F2  - 오실로스코프 모드")
-    print("    F3  - CRT 효과 토글")
-    print("    F4  - 인광체 색상 변경")
-    print("    ESC - 종료")
+    print("    F1/F2   - 시각화 이전/다음")
+    print("    F3      - CRT 효과 토글")
+    print("    F4      - 인광체 색상 변경")
+    print("    F5      - 설정 (오디오 입력 선택)")
+    print("    SPACE   - 재생/일시정지")
+    print("    ESC     - 종료")
     print()
     print("=" * 60)
     print("  시스템 초기화 중...")

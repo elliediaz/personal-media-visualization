@@ -45,7 +45,14 @@
 - 볼류메트릭 렌더링
 - 4차원 시각화 (3D + 시간/색상)
 
-### 4. 외부 API 연동
+### 4. 데스크톱 GUI (메인프레임 스타일)
+- 80~90년대 군사용 메인프레임/터미널 스타일 레트로 GUI
+- CRT 인광 효과, 스캔라인, 노이즈, 비네트
+- 52개 시각화 스타일 지원
+- 다양한 오디오 입력 지원 (파일, 마이크, 시스템 루프백)
+- 4가지 인광체 색상 (Green, Amber, White, Blue)
+
+### 5. 외부 API 연동
 - REST API 엔드포인트
 - WebSocket 실시간 스트리밍
 - 분석 데이터 제공
@@ -79,6 +86,28 @@ run.bat help          # 도움말
 - 웹 인터페이스: http://localhost:8000/web
 - API 문서 (Swagger): http://localhost:8000/docs
 - API 문서 (ReDoc): http://localhost:8000/redoc
+
+### 데스크톱 GUI 실행
+
+```bash
+# Windows CMD
+gui.bat                    # 기본 실행 (그린 인광체)
+gui.bat amber              # 앰버 인광체
+gui.bat -p blue --no-crt   # 블루, CRT 효과 없이
+
+# 또는 Python 직접 실행
+python run_gui.py -p green
+```
+
+**GUI 단축키:**
+| 키 | 기능 |
+|-----|------|
+| F1/F2, LEFT/RIGHT | 시각화 전환 (52개 스타일) |
+| F3 | CRT 효과 토글 |
+| F4 | 인광체 색상 변경 |
+| F5 | 설정 화면 (오디오 입력 선택) |
+| SPACE | 재생/일시정지 (파일 모드) |
+| ESC | 종료 |
 
 ### 실행 스크립트 명령어
 
@@ -209,6 +238,10 @@ personal-media-visualization/
 │   │   ├── retro/         # 레트로/CRT 효과
 │   │   ├── animation/     # 애니메이션 및 내보내기
 │   │   └── advanced/      # 3D/4D 시각화 (예정)
+│   ├── gui/               # 데스크톱 GUI (메인프레임 스타일)
+│   │   ├── mainframe_app.py  # 메인 애플리케이션
+│   │   ├── visualizations.py # 52개 시각화 스타일
+│   │   └── audio_input.py    # 오디오 입력 관리
 │   ├── api/               # REST API 및 WebSocket
 │   ├── cli/               # CLI 인터페이스
 │   └── utils/             # 유틸리티 함수
@@ -225,6 +258,8 @@ personal-media-visualization/
 ├── run.sh                 # Linux/macOS 실행 스크립트
 ├── run.bat                # Windows CMD 실행 스크립트
 ├── run.ps1                # Windows PowerShell 실행 스크립트
+├── gui.bat                # GUI 실행 스크립트 (Windows)
+├── run_gui.py             # GUI 진입점
 └── run_api_server.py      # API 서버 진입점
 ```
 

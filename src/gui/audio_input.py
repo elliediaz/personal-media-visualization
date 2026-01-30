@@ -17,6 +17,13 @@ from typing import Optional, Callable, Tuple, List
 import numpy as np
 
 try:
+    import pygame
+    import pygame.mixer
+    PYGAME_AVAILABLE = True
+except ImportError:
+    PYGAME_AVAILABLE = False
+
+try:
     import sounddevice as sd
     SOUNDDEVICE_AVAILABLE = True
 except ImportError:
@@ -195,7 +202,7 @@ class DemoAudioInput(BaseAudioInput):
 
 
 class FileAudioInput(BaseAudioInput):
-    """파일 기반 오디오 입력"""
+    """파일 기반 오디오 입력 (pygame.mixer를 통한 재생 포함)"""
 
     def __init__(self, sample_rate: int = 44100, buffer_size: int = 2048):
         super().__init__(sample_rate, buffer_size)
@@ -205,6 +212,18 @@ class FileAudioInput(BaseAudioInput):
         self._file_path: Optional[str] = None
         self._thread: Optional[threading.Thread] = None
         self._paused = False
+        self._start_time = 0.0
+        self._pause_position = 0.0
+        self._mixer_initialized = False
+
+        # pygame.mixer 초기화
+        if PYGAME_AVAILABLE:
+            try:
+                if not pygame.mixer.get_init():
+                    pygame.mixer.init(frequency=sample_rate, size=-16, channels=2, buffer=1024)
+                self._mixer_initialized = True
+            except Exception as e:
+                print(f"pygame.mixer 초기화 오류: {e}")
 
     def load_file(self, file_path: str) -> bool:
         """오디오 파일 로드"""
@@ -213,30 +232,29 @@ class FileAudioInput(BaseAudioInput):
             return False
 
         try:
+            # 시각화용 데이터 로드 (librosa 또는 soundfile)
             if LIBROSA_AVAILABLE:
-                # librosa로 로드 (리샘플링 지원)
                 audio, sr = librosa.load(str(path), sr=self.sample_rate, mono=True)
                 self._audio_data = audio
             elif SOUNDFILE_AVAILABLE:
-                # soundfile로 로드
                 audio, sr = sf.read(str(path))
                 if len(audio.shape) > 1:
-                    audio = np.mean(audio, axis=1)  # 모노로 변환
-
-                # 리샘플링 필요시
+                    audio = np.mean(audio, axis=1)
                 if sr != self.sample_rate:
-                    # 간단한 리샘플링 (품질 낮음)
                     ratio = self.sample_rate / sr
                     new_len = int(len(audio) * ratio)
                     indices = np.linspace(0, len(audio) - 1, new_len).astype(int)
                     audio = audio[indices]
-
                 self._audio_data = audio
             else:
-                return False
+                self._audio_data = np.zeros(self.buffer_size)
+
+            # pygame.mixer로 재생용 파일 로드
+            if self._mixer_initialized:
+                pygame.mixer.music.load(str(path))
 
             self._file_path = str(path)
-            self._duration = len(self._audio_data) / self.sample_rate
+            self._duration = len(self._audio_data) / self.sample_rate if self._audio_data is not None else 0
             self._position = 0
 
             return True
@@ -247,32 +265,73 @@ class FileAudioInput(BaseAudioInput):
 
     def start(self):
         """재생 시작"""
-        if self._audio_data is None or self.is_running:
+        if self._file_path is None or self.is_running:
             return
 
         self.is_running = True
         self._paused = False
+        self._start_time = time.time()
+
+        # pygame.mixer로 오디오 재생
+        if self._mixer_initialized:
+            try:
+                pygame.mixer.music.play()
+            except Exception as e:
+                print(f"음악 재생 오류: {e}")
+
+        # 시각화 스레드 시작
         self._thread = threading.Thread(target=self._playback_loop, daemon=True)
         self._thread.start()
 
     def stop(self):
         """재생 중지"""
         self.is_running = False
+
+        if self._mixer_initialized:
+            try:
+                pygame.mixer.music.stop()
+            except Exception:
+                pass
+
         if self._thread:
             self._thread.join(timeout=1.0)
+
+        self._position = 0
 
     def pause(self):
         """일시정지"""
         self._paused = True
+        self._pause_position = time.time() - self._start_time
+
+        if self._mixer_initialized:
+            try:
+                pygame.mixer.music.pause()
+            except Exception:
+                pass
 
     def resume(self):
         """재개"""
         self._paused = False
+        self._start_time = time.time() - self._pause_position
+
+        if self._mixer_initialized:
+            try:
+                pygame.mixer.music.unpause()
+            except Exception:
+                pass
 
     def seek(self, position: float):
         """탐색 (0.0 ~ 1.0)"""
         if self._audio_data is not None:
             self._position = int(position * len(self._audio_data))
+            target_time = position * self._duration
+            self._start_time = time.time() - target_time
+
+            if self._mixer_initialized:
+                try:
+                    pygame.mixer.music.set_pos(target_time)
+                except Exception:
+                    pass
 
     def get_state(self) -> AudioState:
         position_ratio = 0.0
@@ -291,34 +350,39 @@ class FileAudioInput(BaseAudioInput):
         )
 
     def _playback_loop(self):
-        """재생 루프"""
+        """재생 루프 (시각화용 데이터 추출)"""
         while self.is_running:
             if self._paused or self._audio_data is None:
                 time.sleep(0.01)
                 continue
 
-            # 현재 위치에서 버퍼 추출
-            end_pos = min(self._position + self.buffer_size, len(self._audio_data))
+            # 현재 재생 위치 계산 (시간 기반)
+            elapsed = time.time() - self._start_time
+            self._position = int(elapsed * self.sample_rate)
 
             if self._position >= len(self._audio_data):
-                # 파일 끝 - 루프 또는 정지
+                # 파일 끝 - 루프
                 self._position = 0
+                self._start_time = time.time()
+                if self._mixer_initialized and not pygame.mixer.music.get_busy():
+                    pygame.mixer.music.play()
                 continue
 
-            waveform = self._audio_data[self._position:end_pos]
+            # 현재 위치에서 버퍼 추출
+            end_pos = min(self._position + self.buffer_size, len(self._audio_data))
+            waveform = self._audio_data[self._position:end_pos].copy()
 
             # 버퍼가 짧으면 패딩
             if len(waveform) < self.buffer_size:
                 waveform = np.pad(waveform, (0, self.buffer_size - len(waveform)))
 
+            # 시각화용 데이터 업데이트
             with self._lock:
                 self._waveform = waveform
                 self._spectrum = self._compute_spectrum(waveform)
 
-            self._position += self.buffer_size // 2  # 50% 오버랩
-
             # 실시간에 맞게 대기
-            time.sleep(self.buffer_size / self.sample_rate / 2)
+            time.sleep(1.0 / 60)  # ~60fps
 
 
 class DeviceAudioInput(BaseAudioInput):

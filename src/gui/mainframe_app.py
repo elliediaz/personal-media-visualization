@@ -10,7 +10,7 @@ import time
 import math
 import random
 from pathlib import Path
-from typing import Optional, Tuple, List, Callable
+from typing import Optional, Tuple, List
 from dataclasses import dataclass
 from enum import Enum
 
@@ -24,6 +24,15 @@ except ImportError:
     print("pygame이 설치되어 있지 않습니다.")
     print("설치: pip install pygame")
     sys.exit(1)
+
+# 시각화 및 오디오 모듈 임포트
+from .visualizations import (
+    VISUALIZATIONS, create_visualization, get_visualization_list,
+    BaseVisualization, VisualizationCategory
+)
+from .audio_input import (
+    AudioInputManager, AudioInputType, AudioDevice, AudioState
+)
 
 
 class PhosphorColor(Enum):
@@ -174,22 +183,40 @@ class CRTEffect:
 class TerminalFont:
     """터미널 스타일 폰트 렌더러"""
 
-    def __init__(self, size: int = 16):
+    def __init__(self, size: int = 16, font_path: Optional[str] = None):
         pygame.font.init()
 
-        # 모노스페이스 폰트 찾기
-        font_names = [
-            "Consolas", "Courier New", "Lucida Console",
-            "Monaco", "DejaVu Sans Mono", "monospace"
-        ]
-
         self.font = None
-        for name in font_names:
+
+        # 커스텀 폰트 시도
+        if font_path:
             try:
-                self.font = pygame.font.SysFont(name, size)
-                break
-            except:
-                continue
+                self.font = pygame.font.Font(font_path, size)
+            except Exception:
+                pass
+
+        # 폴백: 프로젝트 루트의 NeoDunggeunmoPro-Regular.ttf
+        if self.font is None:
+            try:
+                project_root = Path(__file__).parent.parent.parent
+                neo_font = project_root / "NeoDunggeunmoPro-Regular.ttf"
+                if neo_font.exists():
+                    self.font = pygame.font.Font(str(neo_font), size)
+            except Exception:
+                pass
+
+        # 폴백: 시스템 모노스페이스 폰트
+        if self.font is None:
+            font_names = [
+                "Consolas", "Courier New", "Lucida Console",
+                "Monaco", "DejaVu Sans Mono", "monospace"
+            ]
+            for name in font_names:
+                try:
+                    self.font = pygame.font.SysFont(name, size)
+                    break
+                except Exception:
+                    continue
 
         if self.font is None:
             self.font = pygame.font.Font(None, size)
@@ -300,115 +327,164 @@ class StatusBar:
             )
 
 
-class VisualizerPanel:
-    """오디오 시각화 패널"""
+class SettingsScreen:
+    """설정 화면"""
 
-    def __init__(self, rect: Rect, scheme: ColorScheme):
-        self.rect = rect
+    def __init__(self, width: int, height: int, scheme: ColorScheme,
+                 audio_manager: AudioInputManager, font: TerminalFont):
+        self.width = width
+        self.height = height
         self.scheme = scheme
-        self.waveform_data = np.zeros(100)
-        self.spectrum_data = np.zeros(64)
-        self.mode = "waveform"  # waveform, spectrum, scope
+        self.audio_manager = audio_manager
+        self.font = font
+        self.visible = False
+        self.selected_index = 0
+        self.menu_items: List[Tuple[str, str]] = []
+        self.devices: List[AudioDevice] = []
 
-    def set_waveform(self, data: np.ndarray):
-        """파형 데이터 설정"""
-        self.waveform_data = data
+        self._refresh_menu()
 
-    def set_spectrum(self, data: np.ndarray):
-        """스펙트럼 데이터 설정"""
-        self.spectrum_data = data
+    def _refresh_menu(self):
+        """메뉴 항목 새로고침"""
+        self.devices = self.audio_manager.get_input_devices()
+        self.menu_items = [
+            ("demo", "DEMO MODE"),
+            ("file", "OPEN FILE..."),
+        ]
+
+        for dev in self.devices:
+            prefix = "[LOOPBACK] " if dev.is_loopback else "[MIC] "
+            self.menu_items.append((f"device_{dev.index}", f"{prefix}{dev.name[:40]}"))
+
+        self.menu_items.append(("close", "CLOSE SETTINGS"))
+
+    def show(self):
+        """설정 화면 표시"""
+        self._refresh_menu()
+        self.visible = True
+        self.selected_index = 0
+
+    def hide(self):
+        """설정 화면 숨기기"""
+        self.visible = False
+
+    def handle_event(self, event) -> Optional[str]:
+        """이벤트 처리, 선택된 항목 ID 반환"""
+        if not self.visible:
+            return None
+
+        if event.type == KEYDOWN:
+            if event.key == K_ESCAPE:
+                self.hide()
+                return None
+            elif event.key == K_UP:
+                self.selected_index = (self.selected_index - 1) % len(self.menu_items)
+            elif event.key == K_DOWN:
+                self.selected_index = (self.selected_index + 1) % len(self.menu_items)
+            elif event.key == K_RETURN:
+                item_id, _ = self.menu_items[self.selected_index]
+                return item_id
+
+        return None
 
     def draw(self, surface: Surface):
-        """시각화 그리기"""
-        pygame.draw.rect(surface, self.scheme.background, self.rect)
-        pygame.draw.rect(surface, self.scheme.border, self.rect, 1)
-
-        if self.mode == "waveform":
-            self._draw_waveform(surface)
-        elif self.mode == "spectrum":
-            self._draw_spectrum(surface)
-        elif self.mode == "scope":
-            self._draw_scope(surface)
-
-    def _draw_waveform(self, surface: Surface):
-        """파형 그리기"""
-        if len(self.waveform_data) < 2:
+        """설정 화면 그리기"""
+        if not self.visible:
             return
 
-        cx = self.rect.x + self.rect.width // 2
-        cy = self.rect.y + self.rect.height // 2
+        # 반투명 배경
+        overlay = Surface((self.width, self.height), SRCALPHA)
+        overlay.fill((0, 0, 0, 200))
+        surface.blit(overlay, (0, 0))
 
-        # 중앙선
+        # 설정 창
+        panel_width = 500
+        panel_height = min(400, 100 + len(self.menu_items) * 25)
+        panel_x = (self.width - panel_width) // 2
+        panel_y = (self.height - panel_height) // 2
+
+        panel_rect = Rect(panel_x, panel_y, panel_width, panel_height)
+
+        # 배경
+        pygame.draw.rect(surface, self.scheme.background, panel_rect)
+        pygame.draw.rect(surface, self.scheme.border, panel_rect, 3)
+
+        # 타이틀
+        title = "■ AUDIO INPUT SETTINGS ■"
+        title_surface = self.font.render(title, self.scheme.bright)
+        surface.blit(title_surface, (panel_x + 20, panel_y + 15))
+
         pygame.draw.line(
-            surface, self.scheme.dim,
-            (self.rect.x, cy), (self.rect.x + self.rect.width, cy)
+            surface, self.scheme.border,
+            (panel_x + 10, panel_y + 40),
+            (panel_x + panel_width - 10, panel_y + 40)
         )
 
-        # 파형
-        points = []
-        for i, val in enumerate(self.waveform_data):
-            x = self.rect.x + int(i * self.rect.width / len(self.waveform_data))
-            y = cy - int(val * self.rect.height * 0.4)
-            points.append((x, y))
+        # 메뉴 항목
+        y = panel_y + 55
+        for i, (item_id, item_name) in enumerate(self.menu_items):
+            is_selected = i == self.selected_index
 
-        if len(points) > 1:
-            pygame.draw.lines(surface, self.scheme.bright, False, points, 2)
-
-    def _draw_spectrum(self, surface: Surface):
-        """스펙트럼 그리기"""
-        if len(self.spectrum_data) < 1:
-            return
-
-        bar_width = max(1, self.rect.width // len(self.spectrum_data) - 1)
-
-        for i, val in enumerate(self.spectrum_data):
-            x = self.rect.x + i * (bar_width + 1)
-            height = int(val * self.rect.height * 0.9)
-            y = self.rect.y + self.rect.height - height
-
-            # 그라데이션 효과
-            color = self.scheme.foreground
-            if val > 0.7:
+            if is_selected:
+                # 선택 하이라이트
+                pygame.draw.rect(
+                    surface, self.scheme.dim,
+                    (panel_x + 10, y - 2, panel_width - 20, 22)
+                )
+                prefix = "> "
                 color = self.scheme.bright
-            elif val > 0.9:
-                color = self.scheme.highlight
+            else:
+                prefix = "  "
+                color = self.scheme.foreground
 
-            pygame.draw.rect(surface, color, (x, y, bar_width, height))
+            text = f"{prefix}{item_name}"
+            text_surface = self.font.render(text, color)
+            surface.blit(text_surface, (panel_x + 20, y))
 
-    def _draw_scope(self, surface: Surface):
-        """오실로스코프 스타일"""
-        cx = self.rect.x + self.rect.width // 2
-        cy = self.rect.y + self.rect.height // 2
+            y += 25
 
-        # 그리드
-        for i in range(0, self.rect.width, 20):
-            pygame.draw.line(
-                surface, self.scheme.dim,
-                (self.rect.x + i, self.rect.y),
-                (self.rect.x + i, self.rect.y + self.rect.height)
-            )
-        for i in range(0, self.rect.height, 20):
-            pygame.draw.line(
-                surface, self.scheme.dim,
-                (self.rect.x, self.rect.y + i),
-                (self.rect.x + self.rect.width, self.rect.y + i)
-            )
+        # 도움말
+        help_text = "UP/DOWN: Select  ENTER: Confirm  ESC: Close"
+        help_surface = self.font.render(help_text, self.scheme.dim)
+        surface.blit(help_surface, (panel_x + 20, panel_y + panel_height - 30))
 
-        # 파형 (녹색 발광 효과)
-        if len(self.waveform_data) > 1:
-            points = []
-            for i, val in enumerate(self.waveform_data):
-                x = self.rect.x + int(i * self.rect.width / len(self.waveform_data))
-                y = cy - int(val * self.rect.height * 0.4)
-                points.append((x, y))
 
-            # 글로우 효과
-            for offset in range(3, 0, -1):
-                alpha = 100 - offset * 30
-                glow_color = (*self.scheme.foreground[:3],)
-                pygame.draw.lines(surface, glow_color, False, points, offset * 2)
+class VisualizationSelector:
+    """시각화 선택기"""
 
-            pygame.draw.lines(surface, self.scheme.bright, False, points, 2)
+    def __init__(self, scheme: ColorScheme):
+        self.scheme = scheme
+        self.viz_list = list(VISUALIZATIONS.keys())
+        self.current_index = 0
+        self.categories = list(VisualizationCategory)
+        self.current_category_index = 0
+        self.filter_by_category = False
+
+    def next(self):
+        """다음 시각화"""
+        self.current_index = (self.current_index + 1) % len(self.viz_list)
+
+    def prev(self):
+        """이전 시각화"""
+        self.current_index = (self.current_index - 1) % len(self.viz_list)
+
+    def next_category(self):
+        """다음 카테고리"""
+        self.current_category_index = (self.current_category_index + 1) % len(self.categories)
+
+    def get_current_id(self) -> str:
+        """현재 시각화 ID"""
+        return self.viz_list[self.current_index]
+
+    def get_current_info(self) -> Tuple[str, str, str]:
+        """현재 시각화 정보 (id, name, name_kr)"""
+        viz_id = self.viz_list[self.current_index]
+        _, info = VISUALIZATIONS[viz_id]
+        return viz_id, info.name, info.name_kr
+
+    def get_index_text(self) -> str:
+        """인덱스 텍스트"""
+        return f"{self.current_index + 1}/{len(self.viz_list)}"
 
 
 class MainframeApp:
@@ -445,13 +521,29 @@ class MainframeApp:
         # CRT 효과
         self.crt = CRTEffect(width, height) if crt_effects else None
 
-        # 폰트
+        # 폰트 (NeoDunggeunmoPro 사용)
         self.font = TerminalFont(14)
         self.font_large = TerminalFont(18)
         self.font_small = TerminalFont(12)
 
+        # 오디오 관리자
+        self.audio_manager = AudioInputManager()
+
+        # 시각화 선택기
+        self.viz_selector = VisualizationSelector(self.scheme)
+
+        # 현재 시각화
+        self._current_visualization: Optional[BaseVisualization] = None
+        self._secondary_visualization: Optional[BaseVisualization] = None
+        self._setup_visualization()
+
         # UI 컴포넌트
         self._setup_ui()
+
+        # 설정 화면
+        self.settings_screen = SettingsScreen(
+            width, height, self.scheme, self.audio_manager, self.font
+        )
 
         # 상태
         self.frame_count = 0
@@ -463,8 +555,35 @@ class MainframeApp:
         self.terminal_lines: List[Tuple[str, Tuple[int, int, int]]] = []
         self.max_terminal_lines = 20
 
-        # 시뮬레이션용 데이터
-        self._init_demo_data()
+        # 데모 모드 자동 시작
+        self.audio_manager.start_demo()
+
+    def _get_colors_dict(self) -> dict:
+        """색상 스킴을 dict로 변환"""
+        return {
+            'background': self.scheme.background,
+            'foreground': self.scheme.foreground,
+            'dim': self.scheme.dim,
+            'bright': self.scheme.bright,
+            'highlight': self.scheme.highlight,
+            'warning': self.scheme.warning,
+            'error': self.scheme.error,
+            'border': self.scheme.border,
+        }
+
+    def _setup_visualization(self):
+        """시각화 설정"""
+        viz_id = self.viz_selector.get_current_id()
+        colors = self._get_colors_dict()
+
+        # 메인 시각화 영역
+        viz_width = self.width - 320
+        viz_rect = Rect(14, 72, viz_width - 28, 370)
+        self._current_visualization = create_visualization(viz_id, viz_rect, colors)
+
+        # 하단 스펙트럼 영역 (항상 spectrum_bars)
+        spectrum_rect = Rect(14, 482, viz_width - 28, 170)
+        self._secondary_visualization = create_visualization("spectrum_bars", spectrum_rect, colors)
 
     def _setup_ui(self):
         """UI 컴포넌트 설정"""
@@ -473,13 +592,10 @@ class MainframeApp:
 
         # 메인 시각화 패널
         viz_width = self.width - 320
+        viz_id, viz_name, viz_name_kr = self.viz_selector.get_current_info()
         self.viz_panel = Panel(
             Rect(10, 50, viz_width - 20, 400),
-            "■ WAVEFORM ANALYSIS ■",
-            self.scheme
-        )
-        self.visualizer = VisualizerPanel(
-            Rect(14, 72, viz_width - 28, 370),
+            f"■ {viz_name_kr.upper()} ({self.viz_selector.get_index_text()}) ■",
             self.scheme
         )
 
@@ -489,11 +605,6 @@ class MainframeApp:
             "■ FREQUENCY SPECTRUM ■",
             self.scheme
         )
-        self.spectrum_viz = VisualizerPanel(
-            Rect(14, 482, viz_width - 28, 170),
-            self.scheme
-        )
-        self.spectrum_viz.mode = "spectrum"
 
         # 사이드 패널 - 시스템 상태
         side_x = self.width - 300
@@ -503,10 +614,10 @@ class MainframeApp:
             self.scheme
         )
 
-        # 사이드 패널 - 파일 정보
+        # 사이드 패널 - 파일/오디오 정보
         self.file_panel = Panel(
             Rect(side_x, 260, 290, 150),
-            "■ FILE INFO ■",
+            "■ AUDIO INFO ■",
             self.scheme
         )
 
@@ -523,11 +634,15 @@ class MainframeApp:
             self.scheme
         )
 
-    def _init_demo_data(self):
-        """데모 데이터 초기화"""
-        self.demo_phase = 0
-        self.demo_waveform = np.zeros(200)
-        self.demo_spectrum = np.zeros(64)
+    def _update_panel_title(self):
+        """시각화 패널 타이틀 업데이트"""
+        viz_id, viz_name, viz_name_kr = self.viz_selector.get_current_info()
+        viz_width = self.width - 320
+        self.viz_panel = Panel(
+            Rect(10, 50, viz_width - 20, 400),
+            f"■ {viz_name_kr.upper()} ({self.viz_selector.get_index_text()}) ■",
+            self.scheme
+        )
 
     def log(self, message: str, level: str = "INFO"):
         """터미널에 로그 추가"""
@@ -547,6 +662,32 @@ class MainframeApp:
         if len(self.terminal_lines) > self.max_terminal_lines:
             self.terminal_lines.pop(0)
 
+    def _open_file_dialog(self) -> Optional[str]:
+        """파일 열기 다이얼로그 (tkinter 사용)"""
+        try:
+            import tkinter as tk
+            from tkinter import filedialog
+            root = tk.Tk()
+            root.withdraw()
+            root.attributes('-topmost', True)
+
+            formats = self.audio_manager.get_supported_formats()
+            filetypes = [
+                ("Audio Files", " ".join(f"*{fmt}" for fmt in formats)),
+                ("All Files", "*.*"),
+            ]
+
+            file_path = filedialog.askopenfilename(
+                title="Select Audio File",
+                filetypes=filetypes
+            )
+            root.destroy()
+
+            return file_path if file_path else None
+        except Exception as e:
+            self.log(f"FILE DIALOG ERROR: {e}", "ERROR")
+            return None
+
     def run(self):
         """메인 루프 실행"""
         self.running = True
@@ -554,8 +695,8 @@ class MainframeApp:
 
         self.log("SYSTEM INITIALIZATION COMPLETE", "OK")
         self.log("AUDIO SUBSYSTEM ONLINE", "OK")
-        self.log("VISUALIZATION ENGINE READY", "OK")
-        self.log("AWAITING INPUT...", "INFO")
+        self.log("52 VISUALIZATION MODES LOADED", "OK")
+        self.log("PRESS F5 FOR SETTINGS", "INFO")
 
         while self.running:
             self._handle_events()
@@ -563,6 +704,7 @@ class MainframeApp:
             self._render()
             self.clock.tick(self.fps)
 
+        self.audio_manager.stop()
         pygame.quit()
 
     def _handle_events(self):
@@ -570,63 +712,143 @@ class MainframeApp:
         for event in pygame.event.get():
             if event.type == QUIT:
                 self.running = False
-            elif event.type == KEYDOWN:
-                if event.key == K_ESCAPE:
-                    self.running = False
-                elif event.key == K_F1:
-                    self.visualizer.mode = "waveform"
-                    self.log("MODE: WAVEFORM", "INFO")
-                elif event.key == K_F2:
-                    self.visualizer.mode = "scope"
-                    self.log("MODE: OSCILLOSCOPE", "INFO")
-                elif event.key == K_F3:
-                    self.crt_effects_enabled = not self.crt_effects_enabled
-                    status = "ENABLED" if self.crt_effects_enabled else "DISABLED"
-                    self.log(f"CRT EFFECTS: {status}", "INFO")
-                elif event.key == K_F4:
-                    # 인광체 색상 변경
-                    colors = list(PhosphorColor)
-                    idx = colors.index(self.phosphor)
-                    self.phosphor = colors[(idx + 1) % len(colors)]
-                    self.scheme = PHOSPHOR_SCHEMES[self.phosphor]
-                    self._setup_ui()
-                    self.log(f"PHOSPHOR: {self.phosphor.value.upper()}", "INFO")
+
+            # 설정 화면이 열려있으면 설정 화면에서 처리
+            if self.settings_screen.visible:
+                result = self.settings_screen.handle_event(event)
+                if result:
+                    self._handle_settings_selection(result)
+                continue
+
+            if event.type == KEYDOWN:
+                self._handle_keydown(event)
+
+    def _handle_keydown(self, event):
+        """키 입력 처리"""
+        if event.key == K_ESCAPE:
+            self.running = False
+
+        elif event.key == K_F1:
+            # 이전 시각화
+            self.viz_selector.prev()
+            self._switch_visualization()
+
+        elif event.key == K_F2:
+            # 다음 시각화
+            self.viz_selector.next()
+            self._switch_visualization()
+
+        elif event.key == K_F3:
+            # CRT 효과 토글
+            self.crt_effects_enabled = not self.crt_effects_enabled
+            status = "ENABLED" if self.crt_effects_enabled else "DISABLED"
+            self.log(f"CRT EFFECTS: {status}", "INFO")
+
+        elif event.key == K_F4:
+            # 인광체 색상 변경
+            colors = list(PhosphorColor)
+            idx = colors.index(self.phosphor)
+            self.phosphor = colors[(idx + 1) % len(colors)]
+            self.scheme = PHOSPHOR_SCHEMES[self.phosphor]
+            self._setup_ui()
+            self._setup_visualization()
+            self.log(f"PHOSPHOR: {self.phosphor.value.upper()}", "INFO")
+
+        elif event.key == K_F5:
+            # 설정 화면 열기
+            self.settings_screen.show()
+            self.log("SETTINGS OPENED", "INFO")
+
+        elif event.key == K_SPACE:
+            # 일시정지/재개
+            state = self.audio_manager.get_state()
+            if state.input_type == AudioInputType.FILE:
+                if state.is_playing:
+                    self.audio_manager.pause()
+                    self.log("PLAYBACK PAUSED", "INFO")
+                else:
+                    self.audio_manager.resume()
+                    self.log("PLAYBACK RESUMED", "INFO")
+
+        elif event.key == K_LEFT:
+            # 시각화 이전
+            self.viz_selector.prev()
+            self._switch_visualization()
+
+        elif event.key == K_RIGHT:
+            # 시각화 다음
+            self.viz_selector.next()
+            self._switch_visualization()
+
+    def _handle_settings_selection(self, selection: str):
+        """설정 선택 처리"""
+        if selection == "close":
+            self.settings_screen.hide()
+
+        elif selection == "demo":
+            self.audio_manager.start_demo()
+            self.current_file = "DEMO MODE"
+            self.log("DEMO MODE ACTIVATED", "OK")
+            self.settings_screen.hide()
+
+        elif selection == "file":
+            file_path = self._open_file_dialog()
+            if file_path:
+                if self.audio_manager.load_file(file_path):
+                    self.current_file = Path(file_path).name
+                    self.log(f"LOADED: {self.current_file}", "OK")
+                else:
+                    self.log("FILE LOAD FAILED", "ERROR")
+            self.settings_screen.hide()
+
+        elif selection.startswith("device_"):
+            try:
+                device_index = int(selection.split("_")[1])
+                if self.audio_manager.start_device(device_index):
+                    state = self.audio_manager.get_state()
+                    self.current_file = state.device_name[:30]
+                    input_type = "LOOPBACK" if state.input_type == AudioInputType.LOOPBACK else "MIC"
+                    self.log(f"{input_type} INPUT ACTIVE", "OK")
+                else:
+                    self.log("DEVICE INIT FAILED", "ERROR")
+            except (ValueError, IndexError):
+                self.log("INVALID DEVICE", "ERROR")
+            self.settings_screen.hide()
+
+    def _switch_visualization(self):
+        """시각화 전환"""
+        viz_id, viz_name, viz_name_kr = self.viz_selector.get_current_info()
+        colors = self._get_colors_dict()
+
+        viz_width = self.width - 320
+        viz_rect = Rect(14, 72, viz_width - 28, 370)
+        self._current_visualization = create_visualization(viz_id, viz_rect, colors)
+        self._update_panel_title()
+        self.log(f"VIZ: {viz_name_kr.upper()}", "INFO")
 
     def _update(self):
         """상태 업데이트"""
         self.frame_count += 1
+        dt = 1.0 / self.fps
 
-        # 데모 데이터 생성 (실제로는 오디오 데이터 사용)
-        self.demo_phase += 0.1
-        t = np.linspace(0, 4 * np.pi, 200)
-        self.demo_waveform = (
-            np.sin(t + self.demo_phase) * 0.5 +
-            np.sin(t * 2.5 + self.demo_phase * 1.3) * 0.3 +
-            np.sin(t * 4.1 + self.demo_phase * 0.7) * 0.2 +
-            np.random.randn(200) * 0.05
-        )
+        # 시각화 업데이트
+        if self._current_visualization:
+            self._current_visualization.update(dt)
+        if self._secondary_visualization:
+            self._secondary_visualization.update(dt)
 
-        # 스펙트럼 데모
-        for i in range(64):
-            target = (
-                0.5 * np.exp(-i / 20) *
-                (1 + 0.5 * np.sin(self.demo_phase + i * 0.2))
-            )
-            self.demo_spectrum[i] = (
-                self.demo_spectrum[i] * 0.8 + target * 0.2
-            )
-
-        self.visualizer.set_waveform(self.demo_waveform)
-        self.spectrum_viz.set_spectrum(self.demo_spectrum)
+        # 오디오 상태
+        state = self.audio_manager.get_state()
 
         # 상태 바 업데이트
         elapsed = time.time() - self.start_time
+        viz_id, viz_name, viz_name_kr = self.viz_selector.get_current_info()
+
         self.status_bar.set_items([
             ("TIME", time.strftime("%H:%M:%S")),
-            ("ELAPSED", f"{int(elapsed)}s"),
             ("FPS", f"{int(self.clock.get_fps())}"),
-            ("FRAMES", str(self.frame_count)),
-            ("MODE", self.visualizer.mode.upper()),
+            ("VIZ", f"{self.viz_selector.get_index_text()}"),
+            ("INPUT", state.input_type.value.upper()[:6]),
             ("CRT", "ON" if self.crt_effects_enabled else "OFF"),
         ])
 
@@ -640,16 +862,29 @@ class MainframeApp:
 
         # 패널들
         self.viz_panel.draw(self.buffer, self.font)
-        self.visualizer.draw(self.buffer)
 
+        # 메인 시각화 렌더링
+        waveform = self.audio_manager.get_waveform()
+        spectrum = self.audio_manager.get_spectrum()
+
+        if self._current_visualization:
+            self._current_visualization.render(
+                self.buffer, waveform, spectrum, font=self.font_small
+            )
+
+        # 스펙트럼 패널
         self.spectrum_panel.draw(self.buffer, self.font)
-        self.spectrum_viz.draw(self.buffer)
+        if self._secondary_visualization:
+            self._secondary_visualization.render(
+                self.buffer, waveform, spectrum, font=self.font_small
+            )
 
+        # 사이드 패널들
         self.status_panel.draw(self.buffer, self.font)
         self._draw_system_status()
 
         self.file_panel.draw(self.buffer, self.font)
-        self._draw_file_info()
+        self._draw_audio_info()
 
         self.terminal_panel.draw(self.buffer, self.font)
         self._draw_terminal()
@@ -659,6 +894,9 @@ class MainframeApp:
 
         # 도움말
         self._draw_help()
+
+        # 설정 화면
+        self.settings_screen.draw(self.buffer)
 
         # CRT 효과 적용
         if self.crt_effects_enabled and self.crt:
@@ -678,7 +916,7 @@ class MainframeApp:
         )
 
         # 타이틀
-        title = "████ MAINFRAME AUDIO VISUALIZATION SYSTEM v1.0 ████"
+        title = "████ MAINFRAME AUDIO VISUALIZATION SYSTEM v2.0 ████"
         title_surface = self.font_large.render(title, self.scheme.bright)
         title_x = (self.width - title_surface.get_width()) // 2
         self.buffer.blit(title_surface, (title_x, 10))
@@ -696,14 +934,16 @@ class MainframeApp:
         rect = self.status_panel.content_rect
         y = rect.y + 5
 
+        audio_state = self.audio_manager.get_state()
+
         statuses = [
             ("SYSTEM", "ONLINE", self.scheme.bright),
             ("AUDIO ENGINE", "READY", self.scheme.bright),
+            ("INPUT TYPE", audio_state.input_type.value.upper(), self.scheme.foreground),
             ("VISUALIZATION", "ACTIVE", self.scheme.bright),
             ("CRT EMULATION", "ON" if self.crt_effects_enabled else "OFF",
              self.scheme.bright if self.crt_effects_enabled else self.scheme.dim),
             ("PHOSPHOR TYPE", self.phosphor.value.upper(), self.scheme.foreground),
-            ("MEMORY", "OK", self.scheme.bright),
         ]
 
         for label, value, color in statuses:
@@ -713,26 +953,42 @@ class MainframeApp:
 
             # 값
             value_text = self.font_small.render(value, color)
-            self.buffer.blit(value_text, (rect.x + 150, y))
+            self.buffer.blit(value_text, (rect.x + 140, y))
 
             # 상태 인디케이터
-            indicator_color = self.scheme.bright if value in ["ONLINE", "READY", "ACTIVE", "ON", "OK"] else self.scheme.dim
-            pygame.draw.circle(self.buffer, indicator_color, (rect.x + 270, y + 6), 4)
+            indicator_color = self.scheme.bright if value in ["ONLINE", "READY", "ACTIVE", "ON"] else self.scheme.dim
+            pygame.draw.circle(self.buffer, indicator_color, (rect.x + 265, y + 6), 4)
 
             y += 18
 
-    def _draw_file_info(self):
-        """파일 정보 그리기"""
+    def _draw_audio_info(self):
+        """오디오 정보 그리기"""
         rect = self.file_panel.content_rect
         y = rect.y + 5
 
+        state = self.audio_manager.get_state()
+
+        # 재생 상태
+        if state.input_type == AudioInputType.FILE:
+            status = "PLAYING" if state.is_playing else "PAUSED"
+        elif state.input_type == AudioInputType.DEMO:
+            status = "GENERATING"
+        elif state.input_type in [AudioInputType.MICROPHONE, AudioInputType.LOOPBACK]:
+            status = "CAPTURING"
+        else:
+            status = "STOPPED"
+
         info = [
-            ("FILE", self.current_file),
-            ("FORMAT", "N/A"),
-            ("DURATION", "00:00:00"),
-            ("SAMPLE RATE", "44100 Hz"),
-            ("CHANNELS", "2 (STEREO)"),
+            ("SOURCE", self.current_file[:25] if self.current_file else "N/A"),
+            ("STATUS", status),
+            ("SAMPLE RATE", f"{state.sample_rate} Hz"),
+            ("CHANNELS", str(state.channels)),
         ]
+
+        if state.input_type == AudioInputType.FILE and state.duration > 0:
+            position_sec = state.position * state.duration
+            duration_str = f"{int(position_sec)}/{int(state.duration)}s"
+            info.append(("POSITION", duration_str))
 
         for label, value in info:
             label_text = self.font_small.render(f"{label}:", self.scheme.dim)
@@ -749,7 +1005,7 @@ class MainframeApp:
         y = rect.y + 5
 
         for line, color in self.terminal_lines[-15:]:
-            text = self.font_small.render(line[:45], color)
+            text = self.font_small.render(line[:42], color)
             self.buffer.blit(text, (rect.x + 5, y))
             y += 14
 
@@ -760,7 +1016,7 @@ class MainframeApp:
 
     def _draw_help(self):
         """도움말 그리기"""
-        help_text = "F1:WAVE  F2:SCOPE  F3:CRT  F4:COLOR  ESC:EXIT"
+        help_text = "F1/F2:VIZ  F3:CRT  F4:COLOR  F5:SETTINGS  SPACE:PAUSE  ESC:EXIT"
         text = self.font_small.render(help_text, self.scheme.dim)
         self.buffer.blit(text, (10, self.height - 45))
 

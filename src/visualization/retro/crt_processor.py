@@ -5,7 +5,6 @@ CRT 후처리 프로세서
 """
 
 from pathlib import Path
-from typing import Optional
 
 import numpy as np
 from PIL import Image
@@ -14,11 +13,11 @@ from src.core.config import config
 from src.utils.logging import get_logger
 
 from .effects.base_effect import BaseEffect
-from .effects.scanlines import ScanlinesEffect
-from .effects.chromatic import ChromaticAberrationEffect
-from .effects.noise import NoiseEffect, GlitchEffect
 from .effects.bloom import BloomEffect, HDRBloomEffect
-from .effects.vignette import VignetteEffect, CurvatureEffect
+from .effects.chromatic import ChromaticAberrationEffect
+from .effects.noise import GlitchEffect, NoiseEffect
+from .effects.scanlines import ScanlinesEffect
+from .effects.vignette import CurvatureEffect, VignetteEffect
 
 logger = get_logger(__name__)
 
@@ -202,7 +201,7 @@ class CRTProcessor:
     def process_file(
         self,
         input_path: Path | str,
-        output_path: Optional[Path | str] = None,
+        output_path: Path | str | None = None,
     ) -> np.ndarray:
         """
         파일에서 이미지 로드 후 효과 적용
@@ -243,7 +242,7 @@ class CRTProcessor:
             if hasattr(effect, "update_phase"):
                 effect.update_phase(delta)
 
-    def get_effect(self, effect_type: type) -> Optional[BaseEffect]:
+    def get_effect(self, effect_type: type) -> BaseEffect | None:
         """
         특정 타입의 효과 가져오기
 

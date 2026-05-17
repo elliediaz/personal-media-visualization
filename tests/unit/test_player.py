@@ -5,13 +5,12 @@
 import tempfile
 import time
 from pathlib import Path
-from unittest.mock import MagicMock, Mock, patch
+from unittest.mock import Mock, patch
 
 import pytest
 
 from src.audio.player import AudioPlayer, PlayerState
 from src.core.exceptions import (
-    AudioException,
     AudioFileNotFoundError,
     AudioLoadError,
     AudioPlaybackError,

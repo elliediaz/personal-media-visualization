@@ -4,7 +4,6 @@
 오디오 신호의 주파수 영역 특성을 분석합니다.
 """
 
-from typing import Optional
 
 import librosa
 import numpy as np

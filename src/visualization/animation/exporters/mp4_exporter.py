@@ -4,12 +4,11 @@ MP4 내보내기
 애니메이션을 MP4 형식으로 내보내기
 """
 
-import numpy as np
-from pathlib import Path
-from typing import List, Union
 import subprocess
 import tempfile
-import os
+from pathlib import Path
+
+import numpy as np
 
 from src.utils.logging import get_logger
 
@@ -39,8 +38,8 @@ class MP4Exporter:
 
     def export(
         self,
-        frames: List[np.ndarray],
-        output_path: Union[str, Path],
+        frames: list[np.ndarray],
+        output_path: str | Path,
         fps: int = None,
         codec: str = None,
         quality: int = None,
@@ -87,7 +86,7 @@ class MP4Exporter:
 
     def _export_with_imageio(
         self,
-        frames: List[np.ndarray],
+        frames: list[np.ndarray],
         output_path: Path,
         fps: int,
         codec: str,
@@ -142,7 +141,7 @@ class MP4Exporter:
 
     def _export_with_ffmpeg(
         self,
-        frames: List[np.ndarray],
+        frames: list[np.ndarray],
         output_path: Path,
         fps: int,
         codec: str,
@@ -248,9 +247,9 @@ class MP4Exporter:
 
     def export_with_audio(
         self,
-        frames: List[np.ndarray],
+        frames: list[np.ndarray],
         audio_path: str,
-        output_path: Union[str, Path],
+        output_path: str | Path,
         fps: int = None,
         **kwargs
     ) -> str:
@@ -271,8 +270,8 @@ class MP4Exporter:
 
     def create_preview(
         self,
-        frames: List[np.ndarray],
-        output_path: Union[str, Path],
+        frames: list[np.ndarray],
+        output_path: str | Path,
         fps: int = None,
         duration: float = 5.0
     ) -> str:

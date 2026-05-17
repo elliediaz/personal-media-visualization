@@ -4,8 +4,8 @@
 모든 분석 모듈을 통합하여 오디오 특성을 추출합니다.
 """
 
+from collections.abc import Callable
 from pathlib import Path
-from typing import Callable, Optional
 
 import librosa
 import numpy as np
@@ -53,8 +53,8 @@ class FeatureExtractor:
     def extract(
         self,
         file_path: Path | str,
-        features: Optional[list[str]] = None,
-        progress_callback: Optional[Callable[[str, float], None]] = None,
+        features: list[str] | None = None,
+        progress_callback: Callable[[str, float], None] | None = None,
     ) -> AnalysisResult:
         """
         오디오 파일로부터 특성 추출
@@ -135,7 +135,7 @@ class FeatureExtractor:
             logger.error(f"특성 추출 실패: {e}", exc_info=True)
             raise AudioException(f"특성 추출 실패: {e}")
 
-    def extract_realtime(self, audio_data: np.ndarray, sr: int, features: Optional[list[str]] = None) -> dict:
+    def extract_realtime(self, audio_data: np.ndarray, sr: int, features: list[str] | None = None) -> dict:
         """
         실시간 오디오 데이터로부터 특성 추출
 
@@ -168,7 +168,7 @@ class FeatureExtractor:
 
     def _report_progress(
         self,
-        callback: Optional[Callable[[str, float], None]],
+        callback: Callable[[str, float], None] | None,
         feature_name: str,
         progress: float,
     ) -> None:

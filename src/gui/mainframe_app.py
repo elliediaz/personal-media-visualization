@@ -5,20 +5,19 @@
 CRT 효과, 인광 잔상, 스캔라인 등을 구현합니다.
 """
 
-import sys
-import time
 import math
 import random
-from pathlib import Path
-from typing import Optional, Tuple, List
+import sys
+import time
 from dataclasses import dataclass
 from enum import Enum
+from pathlib import Path
 
 import numpy as np
 
 try:
     import pygame
-    from pygame import Surface, Rect
+    from pygame import Rect, Surface
     from pygame.locals import *
 except ImportError:
     print("pygame이 설치되어 있지 않습니다.")
@@ -26,12 +25,12 @@ except ImportError:
     sys.exit(1)
 
 # 시각화 및 오디오 모듈 임포트
+from .audio_input import AudioDevice, AudioInputManager, AudioInputType
 from .visualizations import (
-    VISUALIZATIONS, create_visualization, get_visualization_list,
-    BaseVisualization, VisualizationCategory
-)
-from .audio_input import (
-    AudioInputManager, AudioInputType, AudioDevice, AudioState
+    VISUALIZATIONS,
+    BaseVisualization,
+    VisualizationCategory,
+    create_visualization,
 )
 
 
@@ -46,14 +45,14 @@ class PhosphorColor(Enum):
 @dataclass
 class ColorScheme:
     """색상 스킴"""
-    background: Tuple[int, int, int]
-    foreground: Tuple[int, int, int]
-    dim: Tuple[int, int, int]
-    bright: Tuple[int, int, int]
-    highlight: Tuple[int, int, int]
-    warning: Tuple[int, int, int]
-    error: Tuple[int, int, int]
-    border: Tuple[int, int, int]
+    background: tuple[int, int, int]
+    foreground: tuple[int, int, int]
+    dim: tuple[int, int, int]
+    bright: tuple[int, int, int]
+    highlight: tuple[int, int, int]
+    warning: tuple[int, int, int]
+    error: tuple[int, int, int]
+    border: tuple[int, int, int]
 
 
 # 인광체 색상별 스킴
@@ -111,7 +110,7 @@ class CRTEffect:
         self.vignette_surface = self._create_vignette()
         self.noise_intensity = 0.02
         self.phosphor_persistence = 0.85
-        self.previous_frame: Optional[Surface] = None
+        self.previous_frame: Surface | None = None
         self.flicker_amount = 0.02
         self.curvature = 0.03
 
@@ -183,7 +182,7 @@ class CRTEffect:
 class TerminalFont:
     """터미널 스타일 폰트 렌더러"""
 
-    def __init__(self, size: int = 16, font_path: Optional[str] = None):
+    def __init__(self, size: int = 16, font_path: str | None = None):
         pygame.font.init()
 
         self.font = None
@@ -224,12 +223,12 @@ class TerminalFont:
         self.char_width = self.font.size("M")[0]
         self.char_height = self.font.get_linesize()
 
-    def render(self, text: str, color: Tuple[int, int, int],
+    def render(self, text: str, color: tuple[int, int, int],
                antialias: bool = True) -> Surface:
         """텍스트 렌더링"""
         return self.font.render(text, antialias, color)
 
-    def render_multiline(self, text: str, color: Tuple[int, int, int],
+    def render_multiline(self, text: str, color: tuple[int, int, int],
                          max_width: int = 0) -> Surface:
         """여러 줄 텍스트 렌더링"""
         lines = text.split('\n')
@@ -297,9 +296,9 @@ class StatusBar:
     def __init__(self, rect: Rect, scheme: ColorScheme):
         self.rect = rect
         self.scheme = scheme
-        self.items: List[Tuple[str, str]] = []
+        self.items: list[tuple[str, str]] = []
 
-    def set_items(self, items: List[Tuple[str, str]]):
+    def set_items(self, items: list[tuple[str, str]]):
         """상태 항목 설정 [(label, value), ...]"""
         self.items = items
 
@@ -339,8 +338,8 @@ class SettingsScreen:
         self.font = font
         self.visible = False
         self.selected_index = 0
-        self.menu_items: List[Tuple[str, str]] = []
-        self.devices: List[AudioDevice] = []
+        self.menu_items: list[tuple[str, str]] = []
+        self.devices: list[AudioDevice] = []
 
         self._refresh_menu()
 
@@ -368,7 +367,7 @@ class SettingsScreen:
         """설정 화면 숨기기"""
         self.visible = False
 
-    def handle_event(self, event) -> Optional[str]:
+    def handle_event(self, event) -> str | None:
         """이벤트 처리, 선택된 항목 ID 반환"""
         if not self.visible:
             return None
@@ -476,7 +475,7 @@ class VisualizationSelector:
         """현재 시각화 ID"""
         return self.viz_list[self.current_index]
 
-    def get_current_info(self) -> Tuple[str, str, str]:
+    def get_current_info(self) -> tuple[str, str, str]:
         """현재 시각화 정보 (id, name, name_kr)"""
         viz_id = self.viz_list[self.current_index]
         _, info = VISUALIZATIONS[viz_id]
@@ -538,8 +537,8 @@ class MainframeApp:
         self.viz_selector = VisualizationSelector(self.scheme)
 
         # 현재 시각화
-        self._current_visualization: Optional[BaseVisualization] = None
-        self._secondary_visualization: Optional[BaseVisualization] = None
+        self._current_visualization: BaseVisualization | None = None
+        self._secondary_visualization: BaseVisualization | None = None
         self._setup_visualization()
 
         # UI 컴포넌트
@@ -557,7 +556,7 @@ class MainframeApp:
         self.system_status = "STANDBY"
 
         # 터미널 로그
-        self.terminal_lines: List[Tuple[str, Tuple[int, int, int]]] = []
+        self.terminal_lines: list[tuple[str, tuple[int, int, int]]] = []
         self.max_terminal_lines = 20
 
         # 데모 모드 자동 시작
@@ -667,7 +666,7 @@ class MainframeApp:
         if len(self.terminal_lines) > self.max_terminal_lines:
             self.terminal_lines.pop(0)
 
-    def _open_file_dialog(self) -> Optional[str]:
+    def _open_file_dialog(self) -> str | None:
         """파일 열기 다이얼로그 (tkinter 사용)"""
         try:
             import tkinter as tk

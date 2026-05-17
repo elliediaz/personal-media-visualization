@@ -4,15 +4,12 @@
 파일 로드, 시스템 오디오 캡처, 마이크 입력을 지원합니다.
 """
 
-import sys
-import queue
 import threading
 import time
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from enum import Enum
 from pathlib import Path
-from typing import Optional, Callable, Tuple, List
 
 import numpy as np
 
@@ -72,7 +69,7 @@ class AudioState:
     is_playing: bool
     position: float  # 0.0 ~ 1.0
     duration: float  # seconds
-    file_path: Optional[str] = None
+    file_path: str | None = None
 
 
 class BaseAudioInput(ABC):
@@ -146,7 +143,7 @@ class DemoAudioInput(BaseAudioInput):
     def __init__(self, sample_rate: int = 44100, buffer_size: int = 2048):
         super().__init__(sample_rate, buffer_size)
         self._phase = 0
-        self._thread: Optional[threading.Thread] = None
+        self._thread: threading.Thread | None = None
 
     def start(self):
         """데모 시작"""
@@ -206,11 +203,11 @@ class FileAudioInput(BaseAudioInput):
 
     def __init__(self, sample_rate: int = 44100, buffer_size: int = 2048):
         super().__init__(sample_rate, buffer_size)
-        self._audio_data: Optional[np.ndarray] = None
+        self._audio_data: np.ndarray | None = None
         self._position = 0
         self._duration = 0.0
-        self._file_path: Optional[str] = None
-        self._thread: Optional[threading.Thread] = None
+        self._file_path: str | None = None
+        self._thread: threading.Thread | None = None
         self._paused = False
         self._start_time = 0.0
         self._pause_position = 0.0
@@ -390,13 +387,13 @@ class DeviceAudioInput(BaseAudioInput):
 
     def __init__(self, sample_rate: int = 44100, buffer_size: int = 2048):
         super().__init__(sample_rate, buffer_size)
-        self._device_index: Optional[int] = None
+        self._device_index: int | None = None
         self._device_name = "Unknown"
-        self._stream: Optional[sd.InputStream] = None
+        self._stream: sd.InputStream | None = None
         self._is_loopback = False
 
     @staticmethod
-    def get_input_devices() -> List[AudioDevice]:
+    def get_input_devices() -> list[AudioDevice]:
         """입력 디바이스 목록 반환"""
         devices = []
 
@@ -501,7 +498,7 @@ class AudioInputManager:
         self.sample_rate = sample_rate
         self.buffer_size = buffer_size
 
-        self._current_input: Optional[BaseAudioInput] = None
+        self._current_input: BaseAudioInput | None = None
         self._current_type = AudioInputType.NONE
 
         # 데모 모드로 시작
@@ -590,12 +587,12 @@ class AudioInputManager:
         )
 
     @staticmethod
-    def get_input_devices() -> List[AudioDevice]:
+    def get_input_devices() -> list[AudioDevice]:
         """입력 디바이스 목록"""
         return DeviceAudioInput.get_input_devices()
 
     @staticmethod
-    def get_supported_formats() -> List[str]:
+    def get_supported_formats() -> list[str]:
         """지원하는 오디오 포맷"""
         formats = []
         if LIBROSA_AVAILABLE:

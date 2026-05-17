@@ -4,13 +4,13 @@
 오디오 반응형 파동 간섭 패턴 및 오실로스코프 모드
 """
 
-import numpy as np
 import matplotlib.pyplot as plt
+import numpy as np
 from matplotlib.collections import LineCollection
 
 from src.analysis.result import AnalysisResult
-from src.visualization.artistic.base_artistic import BaseArtisticVisualizer
 from src.utils.logging import get_logger
+from src.visualization.artistic.base_artistic import BaseArtisticVisualizer
 
 logger = get_logger(__name__)
 
@@ -417,7 +417,6 @@ class WaveInterferenceVisualizer(BaseArtisticVisualizer):
         Returns:
             Figure 객체
         """
-        from mpl_toolkits.mplot3d import Axes3D
 
         # 3D 플롯용 Figure 생성
         self.fig = plt.figure(figsize=(10, 8), facecolor=self.bg_color)

@@ -4,17 +4,14 @@
 오디오 파일 관리 API
 """
 
-import hashlib
-import shutil
 from datetime import datetime
 from pathlib import Path
-from typing import Dict, List
 from uuid import uuid4
 
 from fastapi import APIRouter, File, HTTPException, UploadFile, status
 from fastapi.responses import FileResponse
 
-from src.api.models import AudioInfo, AudioUploadResponse, ErrorResponse
+from src.api.models import AudioInfo, AudioUploadResponse
 from src.audio.formats import AudioFormat
 from src.core.config import Config
 from src.utils.logging import get_logger
@@ -26,7 +23,7 @@ config = Config()
 router = APIRouter()
 
 # 오디오 저장소 (실제로는 DB 사용)
-audio_storage: Dict[str, AudioInfo] = {}
+audio_storage: dict[str, AudioInfo] = {}
 
 # 업로드 디렉토리
 UPLOAD_DIR = Path(config.get("api.upload_dir", "data/uploads"))
@@ -66,7 +63,6 @@ def get_audio_info_from_file(file_path: Path, audio_id: str, filename: str) -> A
         오디오 정보
     """
     try:
-        import librosa
         import soundfile as sf
 
         # 기본 정보
@@ -119,7 +115,7 @@ async def upload_audio(file: UploadFile = File(...)):
     try:
         file_ext = Path(file.filename).suffix
         audio_format = AudioFormat.from_extension(file_ext)
-    except ValueError as e:
+    except ValueError:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail=f"지원하지 않는 파일 형식: {file_ext}",
@@ -171,7 +167,7 @@ async def upload_audio(file: UploadFile = File(...)):
             info=audio_info,
         )
 
-    except Exception as e:
+    except Exception:
         # 실패시 파일 삭제
         if file_path.exists():
             file_path.unlink()
@@ -263,7 +259,7 @@ async def delete_audio(audio_id: str):
     logger.info(f"오디오 삭제 완료: {audio_id}")
 
 
-@router.get("/", response_model=List[AudioInfo])
+@router.get("/", response_model=list[AudioInfo])
 async def list_audio():
     """
     오디오 목록 조회

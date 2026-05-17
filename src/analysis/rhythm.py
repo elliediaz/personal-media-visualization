@@ -4,7 +4,6 @@
 템포, 비트, 음 시작점 등 리듬 관련 특성을 분석합니다.
 """
 
-from typing import Optional, Tuple
 
 import librosa
 import numpy as np
@@ -87,7 +86,7 @@ class RhythmAnalyzer:
         logger.debug(f"템포 감지: {tempo:.1f} BPM")
         return tempo
 
-    def track_beats(self, y: np.ndarray, sr: int) -> Tuple[float, np.ndarray]:
+    def track_beats(self, y: np.ndarray, sr: int) -> tuple[float, np.ndarray]:
         """
         비트 추적
 

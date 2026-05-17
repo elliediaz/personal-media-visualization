@@ -7,9 +7,7 @@ WebSocket 엔드포인트
 import asyncio
 import time
 from pathlib import Path
-from typing import Dict, Optional
 
-import numpy as np
 from fastapi import APIRouter, WebSocket, WebSocketDisconnect, status
 from fastapi.websockets import WebSocketState
 
@@ -38,7 +36,7 @@ class ConnectionManager:
 
     def __init__(self):
         """초기화"""
-        self.active_connections: Dict[str, WebSocket] = {}
+        self.active_connections: dict[str, WebSocket] = {}
 
     async def connect(self, websocket: WebSocket, client_id: str):
         """

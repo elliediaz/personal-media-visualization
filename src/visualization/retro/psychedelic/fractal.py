@@ -6,12 +6,11 @@ Mandelbrot/Julia 프랙탈 기반 오디오 반응형 시각화
 
 import numpy as np
 from numba import jit, prange
-import matplotlib.pyplot as plt
 
 from src.analysis.result import AnalysisResult
+from src.utils.logging import get_logger
 from src.visualization.artistic.base_artistic import BaseArtisticVisualizer
 from src.visualization.retro.color_palettes import RetroPalettes
-from src.utils.logging import get_logger
 
 logger = get_logger(__name__)
 

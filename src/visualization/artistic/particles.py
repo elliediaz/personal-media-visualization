@@ -5,13 +5,10 @@
 """
 
 import numpy as np
-import matplotlib.pyplot as plt
-from matplotlib.patches import Circle
-from matplotlib.collections import LineCollection
 
 from src.analysis.result import AnalysisResult
-from src.visualization.artistic.base_artistic import BaseArtisticVisualizer
 from src.utils.logging import get_logger
+from src.visualization.artistic.base_artistic import BaseArtisticVisualizer
 
 logger = get_logger(__name__)
 

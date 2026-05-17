@@ -7,7 +7,6 @@ click 기반 명령행 인터페이스
 import json
 import sys
 from pathlib import Path
-from typing import Optional
 
 import click
 
@@ -74,7 +73,7 @@ def play(audio_file: str, volume: float):
 @click.option("--format", "output_format", default="json", help="출력 형식 (json, yaml)")
 def analyze(
     audio_file: str,
-    output: Optional[str],
+    output: str | None,
     features: tuple,
     output_format: str,
 ):

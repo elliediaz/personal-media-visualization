@@ -4,13 +4,14 @@
 오디오 반응형 글리치 효과 생성
 """
 
-import numpy as np
-from PIL import Image
 import io
 
+import numpy as np
+from PIL import Image
+
 from src.analysis.result import AnalysisResult
-from src.visualization.artistic.base_artistic import BaseArtisticVisualizer
 from src.utils.logging import get_logger
+from src.visualization.artistic.base_artistic import BaseArtisticVisualizer
 
 logger = get_logger(__name__)
 

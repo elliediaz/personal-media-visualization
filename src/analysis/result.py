@@ -8,7 +8,7 @@ import json
 import time
 from dataclasses import asdict, dataclass, field
 from pathlib import Path
-from typing import Any, Optional
+from typing import Any
 
 import numpy as np
 
@@ -108,7 +108,7 @@ class AnalysisResult:
         """
         input_path = Path(input_path)
 
-        with open(input_path, "r", encoding="utf-8") as f:
+        with open(input_path, encoding="utf-8") as f:
             data = json.load(f)
 
         data["file_path"] = Path(data["file_path"])

@@ -7,7 +7,6 @@
 import pickle
 import time
 from pathlib import Path
-from typing import Optional
 
 from src.analysis.result import AnalysisResult
 from src.core.config import config
@@ -23,7 +22,7 @@ class AnalysisCache:
     파일 해시를 키로 사용하여 분석 결과를 저장하고 로드합니다.
     """
 
-    def __init__(self, cache_dir: Optional[Path] = None, ttl: Optional[int] = None):
+    def __init__(self, cache_dir: Path | None = None, ttl: int | None = None):
         """
         AnalysisCache 초기화
 
@@ -40,7 +39,7 @@ class AnalysisCache:
 
         logger.debug(f"AnalysisCache 초기화: dir={self.cache_dir}, ttl={self.ttl}s")
 
-    def get(self, file_hash: str) -> Optional[AnalysisResult]:
+    def get(self, file_hash: str) -> AnalysisResult | None:
         """
         캐시에서 분석 결과 가져오기
 

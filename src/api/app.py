@@ -8,7 +8,6 @@ import time
 from contextlib import asynccontextmanager
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict
 
 from fastapi import FastAPI, Request, status
 from fastapi.exceptions import RequestValidationError
@@ -194,7 +193,7 @@ async def general_exception_handler(request: Request, exc: Exception):
 # ===== 기본 엔드포인트 =====
 
 
-@app.get("/", response_model=Dict[str, str])
+@app.get("/", response_model=dict[str, str])
 async def root():
     """
     루트 엔드포인트
@@ -230,7 +229,7 @@ async def health_check():
 def register_routers():
     """API 라우터 등록"""
     try:
-        from src.api.routes import audio, analysis, visualization
+        from src.api.routes import analysis, audio, visualization
 
         app.include_router(
             audio.router,

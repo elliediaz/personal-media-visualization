@@ -6,21 +6,19 @@
 
 from datetime import datetime
 from pathlib import Path
-from typing import Dict, List
 from uuid import uuid4
 
 from fastapi import APIRouter, BackgroundTasks, HTTPException, status
 from fastapi.responses import FileResponse
 
 from src.api.models import (
-    OutputFormat,
     PresetInfo,
     PresetsResponse,
     VisualizationRequest,
     VisualizationResponse,
     VisualizationType,
 )
-from src.api.routes.analysis import analysis_results, analysis_storage
+from src.api.routes.analysis import analysis_results
 from src.api.routes.audio import UPLOAD_DIR, audio_storage
 from src.audio.formats import AudioFormat
 from src.core.config import Config
@@ -33,7 +31,7 @@ config = Config()
 router = APIRouter()
 
 # 시각화 저장소
-viz_storage: Dict[str, VisualizationResponse] = {}
+viz_storage: dict[str, VisualizationResponse] = {}
 
 # 렌더링 출력 디렉토리
 OUTPUT_DIR = Path(config.get("api.output_dir", "output/api"))
@@ -523,7 +521,7 @@ async def get_presets():
     return PresetsResponse(presets=presets, count=len(presets))
 
 
-@router.get("/", response_model=List[VisualizationResponse])
+@router.get("/", response_model=list[VisualizationResponse])
 async def list_visualizations():
     """
     시각화 목록 조회

@@ -8,19 +8,19 @@
 from .crt_processor import (
     CRTProcessor,
     create_default_processor,
-    create_minimal_processor,
     create_full_processor,
+    create_minimal_processor,
 )
 from .effects import (
     BaseEffect,
-    ScanlinesEffect,
-    ChromaticAberrationEffect,
-    NoiseEffect,
-    GlitchEffect,
     BloomEffect,
-    HDRBloomEffect,
-    VignetteEffect,
+    ChromaticAberrationEffect,
     CurvatureEffect,
+    GlitchEffect,
+    HDRBloomEffect,
+    NoiseEffect,
+    ScanlinesEffect,
+    VignetteEffect,
 )
 
 __all__ = [

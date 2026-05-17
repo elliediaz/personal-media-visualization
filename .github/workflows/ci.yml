@@ -1,0 +1,46 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  lint-and-test:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.10", "3.11", "3.12"]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install system dependencies (audio/SDL)
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libsdl2-dev libsndfile1 ffmpeg
+
+      - name: Install Python dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install numpy scipy soundfile librosa matplotlib \
+            fastapi "uvicorn[standard]" pydantic websockets python-multipart \
+            aiofiles httpx pyyaml python-dotenv click tqdm colorlog pygame \
+            joblib pillow imageio
+          pip install pytest pytest-cov pytest-asyncio pytest-mock ruff
+
+      - name: Lint with ruff
+        run: ruff check src/ tests/
+
+      - name: Run tests
+        env:
+          SDL_AUDIODRIVER: dummy
+          SDL_VIDEODRIVER: dummy
+        run: pytest -o addopts="" -q

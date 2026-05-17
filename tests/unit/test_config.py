@@ -10,7 +10,7 @@ import pytest
 import yaml
 
 from src.core.config import Config
-from src.core.exceptions import ConfigurationException, InvalidConfigurationError
+from src.core.exceptions import InvalidConfigurationError
 
 
 class TestConfig:

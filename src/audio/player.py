@@ -6,13 +6,13 @@
 
 import threading
 import time
+from collections.abc import Callable
 from enum import Enum
 from pathlib import Path
-from typing import Callable, Optional
 
 import pygame
 
-from src.audio.formats import detect_format, is_format_supported
+from src.audio.formats import is_format_supported
 from src.core.config import config
 from src.core.exceptions import (
     AudioException,
@@ -55,7 +55,7 @@ class AudioPlayer:
             config_override: 설정 오버라이드 딕셔너리
         """
         self._state = PlayerState.STOPPED
-        self._file_path: Optional[Path] = None
+        self._file_path: Path | None = None
         self._duration: float = 0.0
         self._start_time: float = 0.0
         self._pause_position: float = 0.0
@@ -63,10 +63,10 @@ class AudioPlayer:
         self._mixer_initialized = False
 
         # 콜백
-        self._on_play: Optional[Callable] = None
-        self._on_pause: Optional[Callable] = None
-        self._on_stop: Optional[Callable] = None
-        self._on_end: Optional[Callable] = None
+        self._on_play: Callable | None = None
+        self._on_pause: Callable | None = None
+        self._on_stop: Callable | None = None
+        self._on_end: Callable | None = None
 
         # 설정 로드
         self._config = config_override or {}
@@ -81,7 +81,7 @@ class AudioPlayer:
         self._init_mixer()
 
         # 재생 종료 이벤트 모니터링 스레드
-        self._monitor_thread: Optional[threading.Thread] = None
+        self._monitor_thread: threading.Thread | None = None
         self._monitoring = False
 
         logger.info("AudioPlayer 초기화 완료")
@@ -376,7 +376,7 @@ class AudioPlayer:
         return self._state
 
     @property
-    def file_path(self) -> Optional[Path]:
+    def file_path(self) -> Path | None:
         """
         현재 로드된 파일 경로
 

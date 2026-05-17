@@ -4,10 +4,10 @@ GIF 내보내기
 애니메이션을 GIF 형식으로 내보내기
 """
 
-import numpy as np
-from pathlib import Path
-from typing import List, Union
 import io
+from pathlib import Path
+
+import numpy as np
 
 from src.utils.logging import get_logger
 
@@ -36,8 +36,8 @@ class GIFExporter:
 
     def export(
         self,
-        frames: List[np.ndarray],
-        output_path: Union[str, Path],
+        frames: list[np.ndarray],
+        output_path: str | Path,
         fps: int = None,
         loop: int = None,
         optimize: bool = None,
@@ -100,7 +100,7 @@ class GIFExporter:
 
     def _export_with_pil(
         self,
-        frames: List[np.ndarray],
+        frames: list[np.ndarray],
         output_path: Path,
         duration: int,
         loop: int,
@@ -150,7 +150,7 @@ class GIFExporter:
 
     def export_to_bytes(
         self,
-        frames: List[np.ndarray],
+        frames: list[np.ndarray],
         fps: int = None,
         **kwargs
     ) -> bytes:
@@ -190,8 +190,8 @@ class GIFExporter:
 
     def create_thumbnail(
         self,
-        frames: List[np.ndarray],
-        output_path: Union[str, Path],
+        frames: list[np.ndarray],
+        output_path: str | Path,
         frame_index: int = 0,
         size: tuple = (200, 200)
     ) -> str:

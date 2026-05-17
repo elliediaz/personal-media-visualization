@@ -9,8 +9,8 @@ import librosa.display
 import numpy as np
 
 from src.analysis.result import AnalysisResult
-from src.visualization.base import BaseVisualizer
 from src.utils.logging import get_logger
+from src.visualization.base import BaseVisualizer
 
 logger = get_logger(__name__)
 

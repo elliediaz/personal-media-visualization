@@ -4,16 +4,16 @@
 시각화 애니메이션 생성을 위한 핵심 엔진
 """
 
-import numpy as np
-from pathlib import Path
-from typing import List, Callable, Any
-import matplotlib.pyplot as plt
-from concurrent.futures import ThreadPoolExecutor
 import io
+from collections.abc import Callable
+from concurrent.futures import ThreadPoolExecutor
+
+import matplotlib.pyplot as plt
+import numpy as np
 
 from src.analysis.result import AnalysisResult
-from src.visualization.base import BaseVisualizer
 from src.utils.logging import get_logger
+from src.visualization.base import BaseVisualizer
 
 logger = get_logger(__name__)
 
@@ -49,7 +49,7 @@ class AnimationEngine:
         fps: int = None,
         progress_callback: Callable[[int, int], None] = None,
         **kwargs
-    ) -> List[np.ndarray]:
+    ) -> list[np.ndarray]:
         """
         애니메이션 프레임 생성
 
@@ -113,7 +113,7 @@ class AnimationEngine:
         max_workers: int = 4,
         progress_callback: Callable[[int, int], None] = None,
         **kwargs
-    ) -> List[np.ndarray]:
+    ) -> list[np.ndarray]:
         """
         병렬 프레임 생성
 
@@ -206,9 +206,9 @@ class AnimationEngine:
 
     def apply_post_processing(
         self,
-        frames: List[np.ndarray] = None,
-        effects: List[str] = None
-    ) -> List[np.ndarray]:
+        frames: list[np.ndarray] = None,
+        effects: list[str] = None
+    ) -> list[np.ndarray]:
         """
         프레임에 후처리 효과 적용
 

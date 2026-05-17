@@ -8,7 +8,6 @@ import logging
 import logging.handlers
 import sys
 from pathlib import Path
-from typing import Optional
 
 import colorlog
 
@@ -17,8 +16,8 @@ from src.core.config import config
 
 def setup_logging(
     name: str = "src",
-    level: Optional[str] = None,
-    log_file: Optional[Path] = None,
+    level: str | None = None,
+    log_file: Path | None = None,
 ) -> logging.Logger:
     """
     로거 설정

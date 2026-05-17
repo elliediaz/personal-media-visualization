@@ -6,7 +6,6 @@
 
 import hashlib
 from pathlib import Path
-from typing import Optional
 
 import librosa
 from mutagen import File as MutagenFile
@@ -189,7 +188,7 @@ class MetadataExtractor:
 
         return file_hash
 
-    def extract_cover_art(self, file_path: Path, output_path: Optional[Path] = None) -> Optional[bytes]:
+    def extract_cover_art(self, file_path: Path, output_path: Path | None = None) -> bytes | None:
         """
         커버 아트 추출
 

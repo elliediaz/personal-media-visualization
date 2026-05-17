@@ -4,13 +4,11 @@
 오디오 반응형 동심원 패턴
 """
 
-import numpy as np
-import matplotlib.pyplot as plt
 from matplotlib.patches import Circle
 
 from src.analysis.result import AnalysisResult
-from src.visualization.artistic.base_artistic import BaseArtisticVisualizer
 from src.utils.logging import get_logger
+from src.visualization.artistic.base_artistic import BaseArtisticVisualizer
 
 logger = get_logger(__name__)
 

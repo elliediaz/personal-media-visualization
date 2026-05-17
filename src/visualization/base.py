@@ -59,7 +59,7 @@ class BaseVisualizer(ABC):
         self.ax = None
 
         # CRT 후처리 설정
-        self._crt_processor: Optional["CRTProcessor"] = None
+        self._crt_processor: CRTProcessor | None = None
         self._crt_enabled = cfg.get("crt_enabled", False)
 
         logger.debug(f"{self.__class__.__name__} 초기화: {self.width}x{self.height}@{self.dpi}dpi")
@@ -73,7 +73,7 @@ class BaseVisualizer(ABC):
         """
         pass
 
-    def create_figure(self, figsize: Optional[tuple] = None) -> tuple:
+    def create_figure(self, figsize: tuple | None = None) -> tuple:
         """
         matplotlib Figure 생성
 
@@ -256,7 +256,7 @@ class BaseVisualizer(ABC):
 
         self.ax.set_title(title, **title_options)
 
-    def set_labels(self, xlabel: Optional[str] = None, ylabel: Optional[str] = None, **kwargs) -> None:
+    def set_labels(self, xlabel: str | None = None, ylabel: str | None = None, **kwargs) -> None:
         """
         축 레이블 설정
 

@@ -4,13 +4,13 @@
 오디오 반응형 사이키델릭 터널/와프 효과
 """
 
-import numpy as np
 import matplotlib.pyplot as plt
+import numpy as np
 
 from src.analysis.result import AnalysisResult
+from src.utils.logging import get_logger
 from src.visualization.artistic.base_artistic import BaseArtisticVisualizer
 from src.visualization.retro.color_palettes import RetroPalettes
-from src.utils.logging import get_logger
 
 logger = get_logger(__name__)
 

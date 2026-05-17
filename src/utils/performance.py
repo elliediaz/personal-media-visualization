@@ -7,10 +7,10 @@
 import os
 import platform
 import time
+from collections import deque
+from collections.abc import Callable
 from dataclasses import dataclass
 from enum import Enum
-from typing import Callable, Optional
-from collections import deque
 
 from src.utils.logging import get_logger
 
@@ -76,7 +76,7 @@ def detect_raspberry_pi() -> bool:
         # /proc/device-tree/model 확인
         model_path = "/proc/device-tree/model"
         if os.path.exists(model_path):
-            with open(model_path, "r") as f:
+            with open(model_path) as f:
                 model = f.read().lower()
                 if "raspberry pi" in model:
                     logger.info(f"라즈베리파이 감지: {model.strip()}")
@@ -85,7 +85,7 @@ def detect_raspberry_pi() -> bool:
         # /proc/cpuinfo 확인
         cpuinfo_path = "/proc/cpuinfo"
         if os.path.exists(cpuinfo_path):
-            with open(cpuinfo_path, "r") as f:
+            with open(cpuinfo_path) as f:
                 cpuinfo = f.read().lower()
                 if "raspberry" in cpuinfo or "bcm" in cpuinfo:
                     logger.info("라즈베리파이 감지 (cpuinfo)")
@@ -105,7 +105,7 @@ def detect_raspberry_pi() -> bool:
     return False
 
 
-def get_cpu_temperature() -> Optional[float]:
+def get_cpu_temperature() -> float | None:
     """
     CPU 온도 조회 (라즈베리파이)
 
@@ -116,7 +116,7 @@ def get_cpu_temperature() -> Optional[float]:
         # 라즈베리파이 온도 파일
         temp_path = "/sys/class/thermal/thermal_zone0/temp"
         if os.path.exists(temp_path):
-            with open(temp_path, "r") as f:
+            with open(temp_path) as f:
                 temp = int(f.read().strip()) / 1000.0
                 return temp
     except Exception:
@@ -133,7 +133,7 @@ def get_memory_usage() -> float:
         메모리 사용률 (0.0 - 1.0)
     """
     try:
-        with open("/proc/meminfo", "r") as f:
+        with open("/proc/meminfo") as f:
             meminfo = {}
             for line in f:
                 parts = line.split()
@@ -180,7 +180,7 @@ class PerformanceMonitor:
         self.last_frame_time = time.time()
 
         # 콜백
-        self.on_mode_change: Optional[Callable[[PerformanceMode, QualitySettings], None]] = None
+        self.on_mode_change: Callable[[PerformanceMode, QualitySettings], None] | None = None
 
         # 자동 초기화
         if self.is_raspberry_pi:
@@ -238,7 +238,7 @@ class PerformanceMonitor:
 
         logger.debug(
             f"성능: FPS={fps:.1f}, 메모리={memory_usage*100:.1f}%, "
-            f"온도={temperature:.1f}C" if temperature else f"온도=N/A"
+            f"온도={temperature:.1f}C" if temperature else "온도=N/A"
         )
 
         # 자동 품질 조절
@@ -251,7 +251,7 @@ class PerformanceMonitor:
         self,
         fps: float,
         memory_usage: float,
-        temperature: Optional[float]
+        temperature: float | None
     ) -> PerformanceMode:
         """
         적절한 성능 모드 결정
@@ -399,7 +399,7 @@ class FrameRateLimiter:
 
 
 # 전역 성능 모니터 인스턴스
-_performance_monitor: Optional[PerformanceMonitor] = None
+_performance_monitor: PerformanceMonitor | None = None
 
 
 def get_performance_monitor(config: dict = None) -> PerformanceMonitor:

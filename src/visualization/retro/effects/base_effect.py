@@ -3,7 +3,6 @@ CRT 효과 기본 추상 클래스
 """
 
 from abc import ABC, abstractmethod
-from typing import Optional
 
 import numpy as np
 
@@ -52,7 +51,7 @@ class BaseEffect(ABC):
         return image
 
     def _blend(
-        self, original: np.ndarray, effect: np.ndarray, alpha: Optional[float] = None
+        self, original: np.ndarray, effect: np.ndarray, alpha: float | None = None
     ) -> np.ndarray:
         """
         원본과 효과 이미지 블렌딩

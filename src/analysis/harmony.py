@@ -4,7 +4,6 @@
 피치, 크로마, 키 감지 등 화성 관련 특성을 분석합니다.
 """
 
-from typing import Optional
 
 import librosa
 import numpy as np

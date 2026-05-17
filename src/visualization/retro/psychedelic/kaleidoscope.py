@@ -4,13 +4,13 @@
 오디오 반응형 만화경 패턴 생성
 """
 
-import numpy as np
 import matplotlib.pyplot as plt
+import numpy as np
 
 from src.analysis.result import AnalysisResult
+from src.utils.logging import get_logger
 from src.visualization.artistic.base_artistic import BaseArtisticVisualizer
 from src.visualization.retro.color_palettes import RetroPalettes
-from src.utils.logging import get_logger
 
 logger = get_logger(__name__)
 
@@ -278,7 +278,7 @@ class KaleidoscopeVisualizer(BaseArtisticVisualizer):
 
         # 꽃잎 경계
         petal_radius = 0.3 + 0.4 * np.cos(Theta * petals + t * 0.5)
-        in_petal = (R < petal_radius).astype(float)
+        in_petal = (petal_radius > R).astype(float)
 
         # 중심부
         center = np.exp(-R**2 * 20) * (1 + energy)

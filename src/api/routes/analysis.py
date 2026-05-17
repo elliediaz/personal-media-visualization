@@ -7,7 +7,6 @@
 import time
 from datetime import datetime
 from pathlib import Path
-from typing import Dict, List, Optional
 from uuid import uuid4
 
 import numpy as np
@@ -33,11 +32,11 @@ config = Config()
 router = APIRouter()
 
 # 분석 결과 저장소 (실제로는 DB 사용)
-analysis_storage: Dict[str, AnalysisResponse] = {}
-analysis_results: Dict[str, AnalysisResult] = {}
+analysis_storage: dict[str, AnalysisResponse] = {}
+analysis_results: dict[str, AnalysisResult] = {}
 
 
-def create_feature_summary(result: AnalysisResult) -> List[FeatureData]:
+def create_feature_summary(result: AnalysisResult) -> list[FeatureData]:
     """
     특성 요약 생성
 
@@ -123,7 +122,7 @@ async def run_analysis(
     analysis_id: str,
     audio_id: str,
     file_path: Path,
-    features: Optional[List[str]] = None,
+    features: list[str] | None = None,
 ):
     """
     백그라운드 분석 실행
@@ -260,10 +259,10 @@ async def get_analysis(analysis_id: str):
     return analysis_storage[analysis_id]
 
 
-@router.get("/{analysis_id}/features", response_model=Dict)
+@router.get("/{analysis_id}/features", response_model=dict)
 async def get_analysis_features(
     analysis_id: str,
-    feature_path: Optional[str] = None,
+    feature_path: str | None = None,
 ):
     """
     분석 특성 조회
@@ -343,8 +342,8 @@ async def delete_analysis(analysis_id: str):
     logger.info(f"분석 삭제 완료: {analysis_id}")
 
 
-@router.get("/", response_model=List[AnalysisResponse])
-async def list_analyses(audio_id: Optional[str] = None):
+@router.get("/", response_model=list[AnalysisResponse])
+async def list_analyses(audio_id: str | None = None):
     """
     분석 목록 조회
 

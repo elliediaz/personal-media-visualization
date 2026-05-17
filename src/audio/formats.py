@@ -4,10 +4,8 @@
 지원되는 오디오 포맷을 정의하고 파일 포맷을 감지합니다.
 """
 
-import mimetypes
 from enum import Enum
 from pathlib import Path
-from typing import Dict, Optional
 
 from src.core.exceptions import AudioFormatNotSupportedError
 from src.utils.logging import get_logger
@@ -77,7 +75,7 @@ class AudioFormat(Enum):
 
 
 # 오디오 포맷 메타데이터
-FORMAT_METADATA: Dict[AudioFormat, Dict[str, str]] = {
+FORMAT_METADATA: dict[AudioFormat, dict[str, str]] = {
     AudioFormat.MP3: {
         "name": "MP3",
         "description": "MPEG-1 Audio Layer 3",
@@ -144,7 +142,7 @@ def detect_format(file_path: Path | str) -> AudioFormat:
     return AudioFormat.from_path(file_path)
 
 
-def get_format_info(audio_format: AudioFormat) -> Dict[str, str]:
+def get_format_info(audio_format: AudioFormat) -> dict[str, str]:
     """
     오디오 포맷 정보 가져오기
 

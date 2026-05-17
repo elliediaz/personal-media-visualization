@@ -9,13 +9,12 @@ import random
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from enum import Enum
-from typing import Tuple, List, Optional, Callable
 
 import numpy as np
 
 try:
     import pygame
-    from pygame import Surface, Rect
+    from pygame import Rect, Surface
 except ImportError:
     pass
 
@@ -1728,17 +1727,17 @@ VISUALIZATIONS = {
 }
 
 
-def get_visualization_list() -> List[VisualizationInfo]:
+def get_visualization_list() -> list[VisualizationInfo]:
     """시각화 목록 반환"""
     return [info for _, info in VISUALIZATIONS.values()]
 
 
-def get_visualization_by_category(category: VisualizationCategory) -> List[VisualizationInfo]:
+def get_visualization_by_category(category: VisualizationCategory) -> list[VisualizationInfo]:
     """카테고리별 시각화 목록"""
     return [info for _, info in VISUALIZATIONS.values() if info.category == category]
 
 
-def create_visualization(viz_id: str, rect: Rect, colors: dict) -> Optional[BaseVisualization]:
+def create_visualization(viz_id: str, rect: Rect, colors: dict) -> BaseVisualization | None:
     """시각화 인스턴스 생성"""
     if viz_id in VISUALIZATIONS:
         viz_class, _ = VISUALIZATIONS[viz_id]

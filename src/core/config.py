@@ -6,7 +6,7 @@ YAML 파일 기반 설정 로드 및 관리
 
 import os
 from pathlib import Path
-from typing import Any, Dict, Optional
+from typing import Any, Optional
 
 import yaml
 from dotenv import load_dotenv
@@ -21,7 +21,7 @@ class Config:
     """설정 관리 클래스"""
 
     _instance: Optional["Config"] = None
-    _config: Dict[str, Any] = {}
+    _config: dict[str, Any] = {}
 
     def __new__(cls):
         """싱글톤 패턴 구현"""
@@ -56,7 +56,7 @@ class Config:
                     f"설정 파일을 찾을 수 없습니다: {config_path}"
                 )
 
-            with open(config_path, "r", encoding="utf-8") as f:
+            with open(config_path, encoding="utf-8") as f:
                 loaded_config = yaml.safe_load(f)
 
             if loaded_config:
@@ -143,7 +143,7 @@ class Config:
 
         return value
 
-    def get_all(self) -> Dict[str, Any]:
+    def get_all(self) -> dict[str, Any]:
         """
         전체 설정 가져오기
 
@@ -152,7 +152,7 @@ class Config:
         """
         return self._config.copy()
 
-    def update(self, config_dict: Dict[str, Any]) -> None:
+    def update(self, config_dict: dict[str, Any]) -> None:
         """
         설정 업데이트
 
@@ -161,7 +161,7 @@ class Config:
         """
         self._deep_update(self._config, config_dict)
 
-    def _deep_update(self, base: Dict, update: Dict) -> None:
+    def _deep_update(self, base: dict, update: dict) -> None:
         """
         딕셔너리 깊은 업데이트
 
@@ -176,32 +176,32 @@ class Config:
                 base[key] = value
 
     @property
-    def audio(self) -> Dict[str, Any]:
+    def audio(self) -> dict[str, Any]:
         """오디오 설정"""
         return self.get("audio", {})
 
     @property
-    def analysis(self) -> Dict[str, Any]:
+    def analysis(self) -> dict[str, Any]:
         """분석 설정"""
         return self.get("analysis", {})
 
     @property
-    def visualization(self) -> Dict[str, Any]:
+    def visualization(self) -> dict[str, Any]:
         """시각화 설정"""
         return self.get("visualization", {})
 
     @property
-    def api(self) -> Dict[str, Any]:
+    def api(self) -> dict[str, Any]:
         """API 설정"""
         return self.get("api", {})
 
     @property
-    def paths(self) -> Dict[str, Any]:
+    def paths(self) -> dict[str, Any]:
         """경로 설정"""
         return self.get("paths", {})
 
     @property
-    def performance(self) -> Dict[str, Any]:
+    def performance(self) -> dict[str, Any]:
         """성능 설정"""
         return self.get("performance", {})
 

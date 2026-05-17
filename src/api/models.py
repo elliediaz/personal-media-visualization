@@ -6,11 +6,9 @@ FastAPI 요청/응답을 위한 Pydantic 모델
 
 from datetime import datetime
 from enum import Enum
-from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 from pydantic import BaseModel, Field, field_validator
-
 
 # ===== Enums =====
 
@@ -76,7 +74,7 @@ class AnalysisRequest(BaseModel):
     """분석 요청"""
 
     audio_id: str = Field(..., description="오디오 ID")
-    features: Optional[List[str]] = Field(
+    features: list[str] | None = Field(
         None, description="추출할 특성 목록 (None이면 전체)"
     )
     use_cache: bool = Field(True, description="캐시 사용 여부")
@@ -85,14 +83,14 @@ class AnalysisRequest(BaseModel):
 class VisualizationRequest(BaseModel):
     """시각화 요청"""
 
-    audio_id: Optional[str] = Field(None, description="오디오 ID")
-    analysis_id: Optional[str] = Field(None, description="분석 결과 ID")
+    audio_id: str | None = Field(None, description="오디오 ID")
+    analysis_id: str | None = Field(None, description="분석 결과 ID")
     viz_type: VisualizationType = Field(..., description="시각화 타입")
     output_format: OutputFormat = Field(OutputFormat.PNG, description="출력 포맷")
     width: int = Field(1920, ge=320, le=7680, description="너비 (px)")
     height: int = Field(1080, ge=240, le=4320, description="높이 (px)")
     dpi: int = Field(100, ge=50, le=300, description="DPI")
-    params: Optional[Dict[str, Any]] = Field(None, description="추가 파라미터")
+    params: dict[str, Any] | None = Field(None, description="추가 파라미터")
 
     @field_validator("params")
     @classmethod
@@ -132,18 +130,18 @@ class AudioUploadResponse(BaseModel):
 
     audio_id: str = Field(..., description="오디오 ID")
     message: str = Field(..., description="메시지")
-    info: Optional[AudioInfo] = Field(None, description="오디오 정보")
+    info: AudioInfo | None = Field(None, description="오디오 정보")
 
 
 class FeatureData(BaseModel):
     """특성 데이터"""
 
     name: str = Field(..., description="특성 이름")
-    shape: Optional[List[int]] = Field(None, description="데이터 형태")
+    shape: list[int] | None = Field(None, description="데이터 형태")
     dtype: str = Field(..., description="데이터 타입")
-    min_value: Optional[float] = Field(None, description="최소값")
-    max_value: Optional[float] = Field(None, description="최대값")
-    mean_value: Optional[float] = Field(None, description="평균값")
+    min_value: float | None = Field(None, description="최소값")
+    max_value: float | None = Field(None, description="최대값")
+    mean_value: float | None = Field(None, description="평균값")
 
 
 class AnalysisResponse(BaseModel):
@@ -152,26 +150,26 @@ class AnalysisResponse(BaseModel):
     analysis_id: str = Field(..., description="분석 ID")
     audio_id: str = Field(..., description="오디오 ID")
     status: AnalysisStatus = Field(..., description="분석 상태")
-    features: Optional[Dict[str, Any]] = Field(None, description="추출된 특성")
-    feature_summary: Optional[List[FeatureData]] = Field(
+    features: dict[str, Any] | None = Field(None, description="추출된 특성")
+    feature_summary: list[FeatureData] | None = Field(
         None, description="특성 요약"
     )
-    duration: Optional[float] = Field(None, description="분석 소요 시간 (초)")
-    error: Optional[str] = Field(None, description="에러 메시지")
+    duration: float | None = Field(None, description="분석 소요 시간 (초)")
+    error: str | None = Field(None, description="에러 메시지")
     created_at: datetime = Field(..., description="생성 시각")
-    completed_at: Optional[datetime] = Field(None, description="완료 시각")
+    completed_at: datetime | None = Field(None, description="완료 시각")
 
 
 class VisualizationResponse(BaseModel):
     """시각화 응답"""
 
     viz_id: str = Field(..., description="시각화 ID")
-    audio_id: Optional[str] = Field(None, description="오디오 ID")
-    analysis_id: Optional[str] = Field(None, description="분석 ID")
+    audio_id: str | None = Field(None, description="오디오 ID")
+    analysis_id: str | None = Field(None, description="분석 ID")
     viz_type: VisualizationType = Field(..., description="시각화 타입")
     output_format: OutputFormat = Field(..., description="출력 포맷")
-    file_path: Optional[str] = Field(None, description="파일 경로")
-    file_url: Optional[str] = Field(None, description="파일 URL")
+    file_path: str | None = Field(None, description="파일 경로")
+    file_url: str | None = Field(None, description="파일 URL")
     width: int = Field(..., description="너비")
     height: int = Field(..., description="높이")
     created_at: datetime = Field(..., description="생성 시각")
@@ -183,13 +181,13 @@ class PresetInfo(BaseModel):
     name: str = Field(..., description="프리셋 이름")
     description: str = Field(..., description="설명")
     viz_type: VisualizationType = Field(..., description="시각화 타입")
-    params: Dict[str, Any] = Field(..., description="파라미터")
+    params: dict[str, Any] = Field(..., description="파라미터")
 
 
 class PresetsResponse(BaseModel):
     """프리셋 목록 응답"""
 
-    presets: List[PresetInfo] = Field(..., description="프리셋 목록")
+    presets: list[PresetInfo] = Field(..., description="프리셋 목록")
     count: int = Field(..., description="프리셋 개수")
 
 
@@ -206,7 +204,7 @@ class ErrorResponse(BaseModel):
 
     error: str = Field(..., description="에러 타입")
     message: str = Field(..., description="에러 메시지")
-    details: Optional[Dict[str, Any]] = Field(None, description="상세 정보")
+    details: dict[str, Any] | None = Field(None, description="상세 정보")
     timestamp: datetime = Field(..., description="시각")
 
 
@@ -218,14 +216,14 @@ class StreamMessage(BaseModel):
 
     type: str = Field(..., description="메시지 타입")
     timestamp: float = Field(..., description="타임스탬프")
-    data: Dict[str, Any] = Field(..., description="데이터")
+    data: dict[str, Any] = Field(..., description="데이터")
 
 
 class AudioStreamData(BaseModel):
     """오디오 스트림 데이터"""
 
     frame_index: int = Field(..., description="프레임 인덱스")
-    audio_data: List[float] = Field(..., description="오디오 데이터")
+    audio_data: list[float] = Field(..., description="오디오 데이터")
     sample_rate: int = Field(..., description="샘플링 레이트")
 
 
@@ -233,10 +231,10 @@ class FeatureStreamData(BaseModel):
     """특성 스트림 데이터"""
 
     frame_index: int = Field(..., description="프레임 인덱스")
-    tempo: Optional[float] = Field(None, description="템포")
-    energy: Optional[float] = Field(None, description="에너지")
-    spectral_centroid: Optional[float] = Field(None, description="Spectral Centroid")
-    pitch: Optional[float] = Field(None, description="피치")
+    tempo: float | None = Field(None, description="템포")
+    energy: float | None = Field(None, description="에너지")
+    spectral_centroid: float | None = Field(None, description="Spectral Centroid")
+    pitch: float | None = Field(None, description="피치")
 
 
 class VisualizationStreamData(BaseModel):
@@ -244,4 +242,4 @@ class VisualizationStreamData(BaseModel):
 
     frame_index: int = Field(..., description="프레임 인덱스")
     viz_type: VisualizationType = Field(..., description="시각화 타입")
-    data: Dict[str, Any] = Field(..., description="시각화 데이터")
+    data: dict[str, Any] = Field(..., description="시각화 데이터")

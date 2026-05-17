@@ -5,8 +5,8 @@
 """
 
 from src.visualization.retro.psychedelic.fractal import FractalVisualizer
-from src.visualization.retro.psychedelic.tunnel import TunnelVisualizer
 from src.visualization.retro.psychedelic.kaleidoscope import KaleidoscopeVisualizer
+from src.visualization.retro.psychedelic.tunnel import TunnelVisualizer
 
 __all__ = [
     "FractalVisualizer",

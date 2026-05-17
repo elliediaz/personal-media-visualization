@@ -4,13 +4,11 @@
 C64, EGA, VGA 등 클래식 색상 팔레트를 제공합니다.
 """
 
-from typing import Tuple
 
 import numpy as np
 
-
 # 타입 정의
-RGB = Tuple[int, int, int]
+RGB = tuple[int, int, int]
 Palette = list[RGB]
 
 

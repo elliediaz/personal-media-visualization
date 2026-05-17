@@ -6,10 +6,10 @@
 
 from src.utils.logging import get_logger, setup_logging
 from src.utils.performance import (
-    PerformanceMode,
-    QualitySettings,
-    PerformanceMonitor,
     FrameRateLimiter,
+    PerformanceMode,
+    PerformanceMonitor,
+    QualitySettings,
     detect_raspberry_pi,
     get_cpu_temperature,
     get_memory_usage,

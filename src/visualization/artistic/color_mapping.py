@@ -5,7 +5,6 @@
 """
 
 import colorsys
-from typing import Tuple
 
 import numpy as np
 
@@ -76,7 +75,7 @@ class ColorMapper:
         normalized = (energy - min_energy) / (max_energy - min_energy)
         return np.clip(normalized, 0.3, 1.0)  # 최소 채도 0.3 유지
 
-    def hsv_to_rgb(self, h: float, s: float, v: float) -> Tuple[float, float, float]:
+    def hsv_to_rgb(self, h: float, s: float, v: float) -> tuple[float, float, float]:
         """
         HSV를 RGB로 변환
 
@@ -92,7 +91,7 @@ class ColorMapper:
 
     def spectral_centroid_to_color(
         self, centroid: float, min_cent: float = 0, max_cent: float = 8000
-    ) -> Tuple[float, float, float]:
+    ) -> tuple[float, float, float]:
         """
         Spectral centroid를 색상으로 변환
 
@@ -127,7 +126,7 @@ class ColorMapper:
         result: AnalysisResult,
         frame_index: int = None,
         mode: str = "spectral"
-    ) -> Tuple[float, float, float]:
+    ) -> tuple[float, float, float]:
         """
         분석 결과를 색상으로 변환
 
@@ -172,8 +171,8 @@ class ColorMapper:
 
     def create_gradient(
         self,
-        start_color: Tuple[float, float, float],
-        end_color: Tuple[float, float, float],
+        start_color: tuple[float, float, float],
+        end_color: tuple[float, float, float],
         steps: int
     ) -> np.ndarray:
         """
@@ -196,7 +195,7 @@ class ColorMapper:
         self,
         result: AnalysisResult,
         num_colors: int = 5
-    ) -> list[Tuple[float, float, float]]:
+    ) -> list[tuple[float, float, float]]:
         """
         오디오 반응형 색상 팔레트 생성
 

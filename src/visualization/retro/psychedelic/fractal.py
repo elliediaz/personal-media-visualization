@@ -217,7 +217,7 @@ class FractalVisualizer(BaseArtisticVisualizer):
             cmap = kwargs.get("cmap", "hot")
 
         # 이미지 표시
-        im = self.ax.imshow(
+        self.ax.imshow(
             fractal_data,
             extent=[x_min, x_max, y_min, y_max],
             cmap=cmap,

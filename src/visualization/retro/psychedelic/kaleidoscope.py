@@ -103,7 +103,7 @@ class KaleidoscopeVisualizer(BaseArtisticVisualizer):
         cmap = self._create_kaleidoscope_colormap(palette_name, centroid)
 
         # 이미지 표시
-        im = self.ax.imshow(
+        self.ax.imshow(
             kaleidoscope,
             extent=[-1, 1, -1, 1],
             cmap=cmap,
@@ -326,7 +326,7 @@ class KaleidoscopeVisualizer(BaseArtisticVisualizer):
 
         # 짝수 세그먼트는 반전
         is_even = (segment_idx % 2 == 0)
-        mirrored_theta = np.where(is_even, local_theta, segment_angle - local_theta)
+        np.where(is_even, local_theta, segment_angle - local_theta)
 
         # 노멀라이즈된 각도로 패턴 샘플링 (근사)
         # 실제로는 패턴 자체가 이미 생성되어 있으므로, 간단한 평균 처리

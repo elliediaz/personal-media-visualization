@@ -373,10 +373,7 @@ class ASCIIRenderer(BaseArtisticVisualizer):
             ASCII 문자열
         """
         # 그레이스케일 변환
-        if len(image.shape) == 3:
-            gray = np.mean(image, axis=2)
-        else:
-            gray = image
+        gray = np.mean(image, axis=2) if len(image.shape) == 3 else image
 
         # 크기 조정
         height, width = gray.shape

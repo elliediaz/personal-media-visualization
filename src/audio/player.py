@@ -431,17 +431,16 @@ class AudioPlayer:
     def _monitor_playback(self) -> None:
         """재생 종료 모니터링 (별도 스레드)"""
         while self._monitoring:
-            if self._state == PlayerState.PLAYING:
-                if not pygame.mixer.music.get_busy():
-                    # 재생 종료됨
-                    self._state = PlayerState.STOPPED
-                    logger.info("재생 종료")
+            if self._state == PlayerState.PLAYING and not pygame.mixer.music.get_busy():
+                # 재생 종료됨
+                self._state = PlayerState.STOPPED
+                logger.info("재생 종료")
 
-                    # 콜백 호출
-                    if self._on_end:
-                        self._on_end()
+                # 콜백 호출
+                if self._on_end:
+                    self._on_end()
 
-                    break
+                break
 
             time.sleep(0.1)  # 100ms마다 체크
 

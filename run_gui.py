@@ -26,8 +26,9 @@ CRT 인광 효과, 스캔라인, 노이즈 등을 포함한 빈티지 모니터 
     ESC             : 종료 (시각화 전용 모드에서는 복귀)
 """
 
-import sys
 import argparse
+import importlib.util
+import sys
 
 
 def main():
@@ -88,9 +89,7 @@ def main():
     args = parser.parse_args()
 
     # pygame 임포트 체크
-    try:
-        import pygame
-    except ImportError:
+    if importlib.util.find_spec("pygame") is None:
         print("=" * 60)
         print("오류: pygame이 설치되어 있지 않습니다.")
         print()
@@ -100,9 +99,7 @@ def main():
         sys.exit(1)
 
     # numpy 임포트 체크
-    try:
-        import numpy
-    except ImportError:
+    if importlib.util.find_spec("numpy") is None:
         print("=" * 60)
         print("오류: numpy가 설치되어 있지 않습니다.")
         print()

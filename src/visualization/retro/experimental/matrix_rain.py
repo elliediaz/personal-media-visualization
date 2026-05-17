@@ -49,7 +49,7 @@ class MatrixRainVisualizer(BaseArtisticVisualizer):
         """
         self.columns = []
 
-        for i in range(num_cols):
+        for _i in range(num_cols):
             column = {
                 'chars': [self._random_char() for _ in range(num_rows)],
                 'y': np.random.randint(-num_rows, 0),

@@ -232,7 +232,7 @@ class AnimationEngine:
 
         processed_frames = []
 
-        for i, frame in enumerate(frames):
+        for _i, frame in enumerate(frames):
             processed = frame.copy()
 
             for effect in effects:

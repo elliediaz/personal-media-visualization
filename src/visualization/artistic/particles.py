@@ -356,7 +356,6 @@ class ParticleVisualizer(BaseArtisticVisualizer):
             x, y: 파티클 위치
             velocities: 속도 벡터
         """
-        scale = 0.05
         self.ax.quiver(
             x, y,
             velocities[:, 0], velocities[:, 1],

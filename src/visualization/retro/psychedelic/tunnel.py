@@ -91,7 +91,7 @@ class TunnelVisualizer(BaseArtisticVisualizer):
         cmap = self._create_tunnel_colormap(palette_name)
 
         # 이미지 표시
-        im = self.ax.imshow(
+        self.ax.imshow(
             Z,
             extent=[-1, 1, -1, 1],
             cmap=cmap,

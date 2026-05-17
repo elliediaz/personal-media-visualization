@@ -60,7 +60,7 @@ class GlitchArtVisualizer(BaseArtisticVisualizer):
         # 오디오 반응형 파라미터
         energy = self.get_audio_reactive_value(result, "energy")
         centroid = self.get_audio_reactive_value(result, "centroid")
-        brightness = self.get_audio_reactive_value(result, "brightness")
+        self.get_audio_reactive_value(result, "brightness")
 
         # 기본 이미지 생성 또는 사용
         if base_image is None:

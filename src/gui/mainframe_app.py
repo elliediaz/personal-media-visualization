@@ -18,13 +18,36 @@ import numpy as np
 try:
     import pygame
     from pygame import Rect, Surface
-    from pygame.locals import *
+    from pygame.locals import (
+        BLEND_ADD,
+        BLEND_RGB_SUB,
+        FULLSCREEN,
+        K_DOWN,
+        K_ESCAPE,
+        K_F1,
+        K_F2,
+        K_F3,
+        K_F4,
+        K_F5,
+        K_F11,
+        K_F12,
+        K_LEFT,
+        K_RETURN,
+        K_RIGHT,
+        K_SPACE,
+        K_UP,
+        KEYDOWN,
+        QUIT,
+        SRCALPHA,
+    )
 except ImportError:
     print("pygame이 설치되어 있지 않습니다.")
     print("설치: pip install pygame")
     sys.exit(1)
 
 # 시각화 및 오디오 모듈 임포트
+import contextlib
+
 from .audio_input import AudioDevice, AudioInputManager, AudioInputType
 from .visualizations import (
     VISUALIZATIONS,
@@ -189,10 +212,8 @@ class TerminalFont:
 
         # 커스텀 폰트 시도
         if font_path:
-            try:
+            with contextlib.suppress(Exception):
                 self.font = pygame.font.Font(font_path, size)
-            except Exception:
-                pass
 
         # 폴백: 프로젝트 루트의 NeoDunggeunmoPro-Regular.ttf
         if self.font is None:
@@ -421,7 +442,7 @@ class SettingsScreen:
 
         # 메뉴 항목
         y = panel_y + 55
-        for i, (item_id, item_name) in enumerate(self.menu_items):
+        for i, (_item_id, item_name) in enumerate(self.menu_items):
             is_selected = i == self.selected_index
 
             if is_selected:
@@ -924,7 +945,7 @@ class MainframeApp:
         state = self.audio_manager.get_state()
 
         # 상태 바 업데이트
-        elapsed = time.time() - self.start_time
+        time.time() - self.start_time
         viz_id, viz_name, viz_name_kr = self.viz_selector.get_current_info()
 
         self.status_bar.set_items([

@@ -4,6 +4,7 @@
 파일 로드, 시스템 오디오 캡처, 마이크 입력을 지원합니다.
 """
 
+import contextlib
 import threading
 import time
 from abc import ABC, abstractmethod
@@ -285,10 +286,8 @@ class FileAudioInput(BaseAudioInput):
         self.is_running = False
 
         if self._mixer_initialized:
-            try:
+            with contextlib.suppress(Exception):
                 pygame.mixer.music.stop()
-            except Exception:
-                pass
 
         if self._thread:
             self._thread.join(timeout=1.0)
@@ -301,10 +300,8 @@ class FileAudioInput(BaseAudioInput):
         self._pause_position = time.time() - self._start_time
 
         if self._mixer_initialized:
-            try:
+            with contextlib.suppress(Exception):
                 pygame.mixer.music.pause()
-            except Exception:
-                pass
 
     def resume(self):
         """재개"""
@@ -312,10 +309,8 @@ class FileAudioInput(BaseAudioInput):
         self._start_time = time.time() - self._pause_position
 
         if self._mixer_initialized:
-            try:
+            with contextlib.suppress(Exception):
                 pygame.mixer.music.unpause()
-            except Exception:
-                pass
 
     def seek(self, position: float):
         """탐색 (0.0 ~ 1.0)"""
@@ -325,10 +320,8 @@ class FileAudioInput(BaseAudioInput):
             self._start_time = time.time() - target_time
 
             if self._mixer_initialized:
-                try:
+                with contextlib.suppress(Exception):
                     pygame.mixer.music.set_pos(target_time)
-                except Exception:
-                    pass
 
     def get_state(self) -> AudioState:
         position_ratio = 0.0

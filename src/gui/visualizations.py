@@ -419,7 +419,6 @@ class Spectrogram3D(BaseVisualization):
         if len(self.history) > self.max_history:
             self.history.pop(0)
 
-        depth_scale = 0.7
         x_offset = 3
         y_offset = 2
 
@@ -690,12 +689,12 @@ class PhaseScope(BaseVisualization):
         scale = min(self.rect.width, self.rect.height) * 0.35
 
         for i in range(half):
-            l = waveform[i]
+            left = waveform[i]
             r = waveform[i + half] if i + half < len(waveform) else waveform[i]
 
             # M/S 변환
-            mid = (l + r) / 2
-            side = (l - r) / 2
+            mid = (left + r) / 2
+            side = (left - r) / 2
 
             x = cx + int(side * scale)
             y = cy - int(mid * scale)
@@ -1087,7 +1086,6 @@ class Scanlines(BaseVisualization):
         if len(waveform) < 1:
             return
 
-        cy = self.rect.centery
         line_height = 3
         num_rows = max(1, self.rect.height // (line_height * 2))
 
@@ -1225,10 +1223,7 @@ class FrequencyBands(BaseVisualization):
 
         for i, (name, start, end) in enumerate(bands):
             end = min(end, len(spectrum))
-            if start < len(spectrum):
-                val = np.mean(spectrum[start:end])
-            else:
-                val = 0
+            val = np.mean(spectrum[start:end]) if start < len(spectrum) else 0
 
             y = self.rect.y + i * band_height
             bar_width = int(val * self.rect.width * 0.8)
@@ -1405,11 +1400,11 @@ class StereoField(BaseVisualization):
 
         half = len(waveform) // 2
         for i in range(0, half, 2):
-            l = waveform[i]
-            r = waveform[i + half] if i + half < len(waveform) else l
+            left = waveform[i]
+            r = waveform[i + half] if i + half < len(waveform) else left
 
-            x = cx + int((l - r) * scale)  # 스테레오 폭
-            y = cy - int((l + r) / 2 * scale)  # 모노 레벨
+            x = cx + int((left - r) * scale)  # 스테레오 폭
+            y = cy - int((left + r) / 2 * scale)  # 모노 레벨
 
             pygame.draw.circle(surface, self.colors['foreground'], (x, y), 1)
 
@@ -1582,7 +1577,6 @@ class Fractal(BaseVisualization):
     def render(self, surface: Surface, waveform: np.ndarray,
                spectrum: np.ndarray, **kwargs):
         cx = self.rect.centerx
-        cy = self.rect.centery
 
         energy = np.mean(np.abs(waveform)) if len(waveform) > 0 else 0.5
         depth = min(6, int(3 + energy * 4))

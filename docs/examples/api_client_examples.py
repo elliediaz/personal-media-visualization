@@ -7,7 +7,6 @@ REST API 및 WebSocket 사용 예제
 import asyncio
 import json
 from pathlib import Path
-from typing import Optional
 
 import httpx
 import websockets
@@ -71,7 +70,7 @@ class AudioVisualizationClient:
         response.raise_for_status()
         return response.json()
 
-    def analyze_audio(self, audio_id: str, features: Optional[list] = None) -> dict:
+    def analyze_audio(self, audio_id: str, features: list | None = None) -> dict:
         """
         오디오 분석 요청
 
@@ -134,11 +133,11 @@ class AudioVisualizationClient:
     def render_visualization(
         self,
         viz_type: str,
-        audio_id: Optional[str] = None,
-        analysis_id: Optional[str] = None,
+        audio_id: str | None = None,
+        analysis_id: str | None = None,
         width: int = 1920,
         height: int = 1080,
-        params: Optional[dict] = None,
+        params: dict | None = None,
     ) -> dict:
         """
         시각화 렌더링 요청

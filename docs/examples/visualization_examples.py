@@ -9,12 +9,12 @@ from pathlib import Path
 import librosa
 
 from src.analysis.extractor import FeatureExtractor
+from src.utils.logging import setup_logging
 from src.visualization.statistical.features import FeatureVisualizer
 from src.visualization.statistical.rhythm import RhythmVisualizer
 from src.visualization.statistical.spectrogram import SpectrogramVisualizer
 from src.visualization.statistical.spectrum import SpectrumVisualizer
 from src.visualization.statistical.waveform import WaveformVisualizer
-from src.utils.logging import setup_logging
 
 # 로깅 설정
 logger = setup_logging("example")

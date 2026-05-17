@@ -142,10 +142,7 @@ class ColorMapper:
             # Spectral centroid 기반
             centroid = result.spectral.get("spectral_centroid")
             if centroid is not None:
-                if frame_index is not None:
-                    value = centroid[frame_index]
-                else:
-                    value = np.mean(centroid)
+                value = centroid[frame_index] if frame_index is not None else np.mean(centroid)
                 return self.spectral_centroid_to_color(value)
 
         elif mode == "rhythm":
@@ -158,10 +155,7 @@ class ColorMapper:
             # RMS 에너지 기반
             rms = result.timbre.get("rms_energy")
             if rms is not None:
-                if frame_index is not None:
-                    energy = rms[frame_index]
-                else:
-                    energy = np.mean(rms)
+                energy = rms[frame_index] if frame_index is not None else np.mean(rms)
 
                 brightness = self.amplitude_to_brightness(energy)
                 return self.hsv_to_rgb(0.5, 0.6, brightness)

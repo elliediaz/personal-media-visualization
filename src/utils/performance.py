@@ -93,11 +93,12 @@ def detect_raspberry_pi() -> bool:
 
         # 플랫폼 확인
         machine = platform.machine().lower()
-        if "arm" in machine or "aarch64" in machine:
-            # ARM 기반이지만 라즈베리파이인지 추가 확인
-            if os.path.exists("/opt/vc/bin/vcgencmd"):
-                logger.info("라즈베리파이 감지 (vcgencmd)")
-                return True
+        # ARM 기반이지만 라즈베리파이인지 추가 확인
+        if ("arm" in machine or "aarch64" in machine) and os.path.exists(
+            "/opt/vc/bin/vcgencmd"
+        ):
+            logger.info("라즈베리파이 감지 (vcgencmd)")
+            return True
 
     except Exception as e:
         logger.debug(f"라즈베리파이 감지 실패: {e}")

@@ -7,10 +7,10 @@
 from pathlib import Path
 
 from src.analysis.extractor import FeatureExtractor
+from src.utils.logging import setup_logging
 from src.visualization.artistic.circles import CircleVisualizer
 from src.visualization.artistic.particles import ParticleVisualizer
 from src.visualization.artistic.waves import WaveInterferenceVisualizer
-from src.utils.logging import setup_logging
 
 # 로깅 설정
 logger = setup_logging("example")

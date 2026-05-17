@@ -79,6 +79,16 @@ ignore = [
 [tool.ruff.lint.per-file-ignores]
 "__init__.py" = ["F401", "F403"]  # unused / star imports for re-export
 "tests/*" = ["ARG", "S101"]  # allow unused args and assert
+# 시각화 클래스는 공통 render() 시그니처를 따르므로 일부 인자가 미사용일 수 있음
+"src/gui/visualizations.py" = ["ARG002"]
+"src/visualization/*" = ["ARG002"]
+# FastAPI lifespan/예외 핸들러는 프레임워크가 시그니처를 강제함
+"src/api/app.py" = ["ARG001"]
+"src/api/routes/visualization.py" = ["ARG001"]
+# 분석기/플레이어 인터페이스 일관성을 위한 미사용 인자 허용
+"src/analysis/spectral.py" = ["ARG002"]
+"src/audio/player.py" = ["ARG002"]
+"src/gui/audio_input.py" = ["ARG002"]
 
 [tool.isort]
 profile = "black"

@@ -76,7 +76,7 @@ class WaveInterferenceVisualizer(BaseArtisticVisualizer):
 
         # 오디오 반응형 파라미터
         energy = self.get_audio_reactive_value(result, "energy")
-        centroid_val = self.get_audio_reactive_value(result, "centroid")
+        self.get_audio_reactive_value(result, "centroid")
 
         # 파동 소스 위치 (onset 기반)
         onset_times = result.rhythm.get("onset_times")
@@ -450,7 +450,7 @@ class WaveInterferenceVisualizer(BaseArtisticVisualizer):
         self.ax.view_init(elev=30, azim=time * 20 % 360)
 
         # 서피스 플롯
-        surf = self.ax.plot_surface(
+        self.ax.plot_surface(
             X, Y, spec_norm,
             cmap='plasma',
             linewidth=0,

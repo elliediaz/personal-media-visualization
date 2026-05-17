@@ -102,7 +102,7 @@ class AudioPlayer:
                     f"버퍼={self._buffer_size}"
                 )
         except pygame.error as e:
-            raise AudioException(f"pygame.mixer 초기화 실패: {e}")
+            raise AudioException(f"pygame.mixer 초기화 실패: {e}") from e
 
     def load(self, file_path: Path | str) -> None:
         """
@@ -152,7 +152,7 @@ class AudioPlayer:
             raise AudioLoadError(
                 f"오디오 파일 로드 실패: {e}",
                 details={"path": str(file_path), "error": str(e)},
-            )
+            ) from e
 
     def _estimate_duration(self, file_path: Path) -> float:
         """
@@ -219,7 +219,7 @@ class AudioPlayer:
             raise AudioPlaybackError(
                 f"재생 시작 실패: {e}",
                 details={"error": str(e)},
-            )
+            ) from e
 
     def pause(self) -> None:
         """
@@ -246,7 +246,7 @@ class AudioPlayer:
             raise AudioPlaybackError(
                 f"일시정지 실패: {e}",
                 details={"error": str(e)},
-            )
+            ) from e
 
     def stop(self) -> None:
         """재생 정지"""
@@ -271,7 +271,7 @@ class AudioPlayer:
             raise AudioPlaybackError(
                 f"재생 정지 실패: {e}",
                 details={"error": str(e)},
-            )
+            ) from e
 
     def seek(self, position: float) -> None:
         """
@@ -305,7 +305,7 @@ class AudioPlayer:
             raise AudioPlaybackError(
                 f"재생 위치 이동 실패: {e}",
                 details={"position": position, "error": str(e)},
-            )
+            ) from e
 
     @property
     def duration(self) -> float:
@@ -466,7 +466,7 @@ class AudioPlayer:
             return y, sr
 
         except Exception as e:
-            raise AudioException(f"오디오 데이터 로드 실패: {e}")
+            raise AudioException(f"오디오 데이터 로드 실패: {e}") from e
 
     def get_duration_accurate(self) -> float:
         """
@@ -490,12 +490,12 @@ class AudioPlayer:
             return duration
 
         except Exception as e:
-            raise AudioException(f"길이 계산 실패: {e}")
+            raise AudioException(f"길이 계산 실패: {e}") from e
 
     def __del__(self):
         """소멸자: 리소스 정리"""
         try:
             self.stop()
             self._stop_monitoring()
-        except:
+        except Exception:
             pass

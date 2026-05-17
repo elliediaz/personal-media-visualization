@@ -302,7 +302,7 @@ class ASCIIRenderer(BaseArtisticVisualizer):
         # 모노스페이스 폰트
         try:
             font = FontProperties(family='monospace', size=6)
-        except:
+        except Exception:
             font = FontProperties(size=6)
 
         for row_idx, line in enumerate(ascii_art):

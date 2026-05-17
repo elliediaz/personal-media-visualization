@@ -7,6 +7,7 @@ STFT, Mel-spectrogram 등을 시각화합니다.
 
 import librosa
 import librosa.display
+import matplotlib.pyplot as plt
 import numpy as np
 
 from src.analysis.result import AnalysisResult

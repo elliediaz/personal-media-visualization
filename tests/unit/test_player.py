@@ -21,6 +21,9 @@ from src.core.exceptions import (
 def mock_pygame():
     """pygame.mixer Mock"""
     with patch("src.audio.player.pygame") as mock_pg:
+        # pygame.error 는 실제 예외 클래스여야 except/raise 가 동작한다
+        mock_pg.error = type("MockPygameError", (Exception,), {})
+
         # mixer 초기화 Mock
         mock_pg.mixer.get_init.return_value = None
         mock_pg.mixer.init.return_value = None

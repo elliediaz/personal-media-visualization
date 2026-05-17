@@ -12,7 +12,7 @@ from fastapi import APIRouter, File, HTTPException, UploadFile, status
 from fastapi.responses import FileResponse
 
 from src.api.models import AudioInfo, AudioUploadResponse
-from src.audio.formats import AudioFormat
+from src.audio.formats import AudioFormat, AudioFormatNotSupportedError
 from src.core.config import Config
 from src.utils.logging import get_logger
 
@@ -88,7 +88,7 @@ def get_audio_info_from_file(file_path: Path, audio_id: str, filename: str) -> A
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"오디오 정보 추출 실패: {str(e)}",
-        )
+        ) from e
 
 
 @router.post("/upload", response_model=AudioUploadResponse, status_code=status.HTTP_201_CREATED)
@@ -114,12 +114,12 @@ async def upload_audio(file: UploadFile = File(...)):
     # 확장자 검증
     try:
         file_ext = Path(file.filename).suffix
-        audio_format = AudioFormat.from_extension(file_ext)
-    except ValueError:
+        AudioFormat.from_extension(file_ext)
+    except (ValueError, AudioFormatNotSupportedError) as e:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail=f"지원하지 않는 파일 형식: {file_ext}",
-        )
+        ) from e
 
     # 파일 크기 제한 (100MB)
     max_size = config.get("api.max_upload_size", 100 * 1024 * 1024)
@@ -152,7 +152,7 @@ async def upload_audio(file: UploadFile = File(...)):
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"파일 저장 실패: {str(e)}",
-        )
+        ) from e
 
     # 오디오 정보 추출
     try:

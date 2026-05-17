@@ -49,13 +49,13 @@ class Config:
         Raises:
             ConfigurationException: 파일 로드 실패 시
         """
-        try:
-            config_path = Path(config_path)
-            if not config_path.exists():
-                raise InvalidConfigurationError(
-                    f"설정 파일을 찾을 수 없습니다: {config_path}"
-                )
+        config_path = Path(config_path)
+        if not config_path.exists():
+            raise InvalidConfigurationError(
+                f"설정 파일을 찾을 수 없습니다: {config_path}"
+            )
 
+        try:
             with open(config_path, encoding="utf-8") as f:
                 loaded_config = yaml.safe_load(f)
 
@@ -63,9 +63,9 @@ class Config:
                 self._config.update(loaded_config)
 
         except yaml.YAMLError as e:
-            raise ConfigurationException(f"YAML 파싱 오류: {e}")
-        except Exception as e:
-            raise ConfigurationException(f"설정 파일 로드 실패: {e}")
+            raise ConfigurationException(f"YAML 파싱 오류: {e}") from e
+        except OSError as e:
+            raise ConfigurationException(f"설정 파일 로드 실패: {e}") from e
 
     def get(self, key: str, default: Any = None) -> Any:
         """
@@ -174,6 +174,11 @@ class Config:
                 self._deep_update(base[key], value)
             else:
                 base[key] = value
+
+    @property
+    def app(self) -> dict[str, Any]:
+        """애플리케이션 설정"""
+        return self.get("app", {})
 
     @property
     def audio(self) -> dict[str, Any]:

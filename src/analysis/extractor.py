@@ -133,7 +133,7 @@ class FeatureExtractor:
 
         except Exception as e:
             logger.error(f"특성 추출 실패: {e}", exc_info=True)
-            raise AudioException(f"특성 추출 실패: {e}")
+            raise AudioException(f"특성 추출 실패: {e}") from e
 
     def extract_realtime(self, audio_data: np.ndarray, sr: int, features: list[str] | None = None) -> dict:
         """

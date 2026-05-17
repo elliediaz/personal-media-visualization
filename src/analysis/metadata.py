@@ -158,7 +158,7 @@ class MetadataExtractor:
 
         except Exception as e:
             logger.error(f"오디오 정보 추출 실패: {e}")
-            raise AudioException(f"오디오 정보 추출 실패: {e}")
+            raise AudioException(f"오디오 정보 추출 실패: {e}") from e
 
     def compute_file_hash(self, file_path: Path, algorithm: str = "md5") -> str:
         """

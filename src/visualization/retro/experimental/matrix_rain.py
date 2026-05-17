@@ -163,7 +163,7 @@ class MatrixRainVisualizer(BaseArtisticVisualizer):
         """
         try:
             font = FontProperties(family='monospace', size=8)
-        except:
+        except Exception:
             font = FontProperties(size=8)
 
         for col_idx, column in enumerate(self.columns):

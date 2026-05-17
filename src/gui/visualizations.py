@@ -1534,7 +1534,7 @@ class Glitch(BaseVisualization):
                     try:
                         region = surface.subsurface(src_rect).copy()
                         surface.blit(region, (self.rect.x + shift, glitch_y))
-                    except:
+                    except Exception:
                         pass
 
 

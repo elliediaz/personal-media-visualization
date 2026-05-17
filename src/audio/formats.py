@@ -46,7 +46,7 @@ class AudioFormat(Enum):
             raise AudioFormatNotSupportedError(
                 f"지원하지 않는 오디오 포맷입니다: {ext}",
                 details={"extension": ext, "supported": [f.value for f in cls]},
-            )
+            ) from None
 
     @classmethod
     def from_path(cls, file_path: Path | str) -> "AudioFormat":
